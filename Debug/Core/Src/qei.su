@@ -1,0 +1,2 @@
+../Core/Src/qei.c:19:6:QEI_Init	16	static
+../Core/Src/qei.c:30:6:QEI_Update	24	static

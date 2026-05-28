@@ -1,0 +1,4 @@
+../Core/Src/serial_frame.c:11:6:SerialFrame_Init	0	static
+../Core/Src/serial_frame.c:17:6:SerialFrame_Reset	0	static
+../Core/Src/serial_frame.c:21:19:SerialFrame_AddPayload	16	static
+../Core/Src/serial_frame.c:32:19:SerialFrame_Transmit	8	static

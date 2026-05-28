@@ -1,0 +1,10 @@
+../Core/Src/main.c:214:6:SystemClock_Config	3
+../Core/Src/main.c:662:6:Motor_QEIUpdate	3
+../Core/Src/main.c:681:6:MD20A_Control	5
+../Core/Src/main.c:702:6:Motor_positionControl	1
+../Core/Src/main.c:715:6:Motor_velocityControl	2
+../Core/Src/main.c:739:6:UARTDMAConfig	1
+../Core/Src/main.c:148:5:main	20
+../Core/Src/main.c:744:6:HAL_TIM_PeriodElapsedCallback	4
+../Core/Src/main.c:767:6:HAL_UART_RxCpltCallback	4
+../Core/Src/main.c:786:6:Error_Handler	1

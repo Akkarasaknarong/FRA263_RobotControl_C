@@ -1,0 +1,3 @@
+../Core/Src/kalman_filter.c:110:6:Motor_KalmanInit	24	static
+../Core/Src/kalman_filter.c:151:6:Motor_KalmanTunning	0	static
+../Core/Src/kalman_filter.c:159:6:Motor_KalmanUpdate	40	static
