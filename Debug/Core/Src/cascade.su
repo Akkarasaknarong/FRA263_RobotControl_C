@@ -1,6 +1,0 @@
-../Core/Src/cascade.c:26:6:Pos_ctrl_Init	4	static
-../Core/Src/cascade.c:29:6:Vel_ctrl_Init	4	static
-../Core/Src/cascade.c:33:6:Pos_ctrl_Tunning	24	static
-../Core/Src/cascade.c:38:6:Vel_ctrl_Tunning	24	static
-../Core/Src/cascade.c:44:6:Pos_ctrl_Compute	40	static
-../Core/Src/cascade.c:54:6:Vel_ctrl_Compute	48	static

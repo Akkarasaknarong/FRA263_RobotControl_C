@@ -1,4 +1,0 @@
-../Core/Src/serial_frame.c:11:6:SerialFrame_Init	1
-../Core/Src/serial_frame.c:17:6:SerialFrame_Reset	1
-../Core/Src/serial_frame.c:21:19:SerialFrame_AddPayload	2
-../Core/Src/serial_frame.c:32:19:SerialFrame_Transmit	1

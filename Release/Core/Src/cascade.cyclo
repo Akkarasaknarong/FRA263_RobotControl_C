@@ -1,4 +1,0 @@
-../Core/Src/cascade.c:31:6:Pos_ctrl_Init	1
-../Core/Src/cascade.c:35:6:Pos_ctrl_Tunning	1
-../Core/Src/cascade.c:40:6:Pos_ctrl_Compute	1
-../Core/Src/cascade.c:51:6:Vel_ctrl_Init	1

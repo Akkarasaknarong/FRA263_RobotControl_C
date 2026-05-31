@@ -1,2 +1,0 @@
-../Core/Src/quintic_traj.c:21:6:QuinticTraj_Init	1
-../Core/Src/quintic_traj.c:38:6:QuinticTraj_Compute	3
