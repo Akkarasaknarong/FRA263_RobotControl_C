@@ -32,18 +32,33 @@ float Remap_CW_CCW(Direction_t _Direction, float _Target_q_deg, float _Start_q_d
 }
 
 void Auto_Worker() {
-	static int state_auto = 0;
+	static int state_auto = -1;
 	static int current_PickPlace = 0;
 	static float target_t = 0;
 	static float start_q = 0, target_q = 0;
-
 	static uint32_t gripper_start_tick = 0;
 
 	switch (state_auto) {
+	case -1:
+		if (Robot.Automode_data.P2P.p2p_value != 0){
+			if(Robot.Automode_data.P2P.unit == deg){
+				start_q = REFdata.ref_q_deg;
+				target_q = start_q + (float)Robot.Automode_data.P2P.p2p_value;
+			} else if (Robot.Automode_data.P2P.unit == idx){
+				start_q = REFdata.ref_q_deg;
+				target_q = start_q + IndexToDegree((float)Robot.Automode_data.P2P.p2p_value);
+			}
+			Timer = 0;
+			state_auto = 88;
+		}
+		else {
+			state_auto = 0 ;
+		}
+		break;
 	case 0:	// Init Trajactory State
 			if (Robot.Automode_data.PickPlace.Number_of_target == 0) {
 				current_PickPlace = 0;
-				state_auto = 0;
+				state_auto = 99;
 				break;
 			}
 			else if (current_PickPlace >= (Robot.Automode_data.PickPlace.Number_of_target * 2)) state_auto = 99;
@@ -97,12 +112,18 @@ void Auto_Worker() {
 				state_auto = 0;
 			}
 			break;
-		case 99:
+		case 88: // P2P State
+			QuinticTraj_P2P(start_q, target_q, 2.5f, Timer);
+			if (Timer >= 2.5f) {
+				state_auto = 99;
+			}
+			break;
+		case 99: // End State Auto
 			Basesystem_Reset_register();
 			Robot.Robot_Status = READY;
 			current_PickPlace = 0;
 			Robot.Automode_data.PickPlace.Number_of_target = 0;
-			state_auto = 0;
+			state_auto = -1;
 			break;
 	}
 }
@@ -113,7 +134,7 @@ void Manual_Worker() {
 	static uint32_t start_tick, wait_time;
 
 	switch (state) {
-		case 0:
+		case 0: // Check State JOG and Gripper
 			if (Robot.Manualmode_data.Jog_value != 0) {
 				start_q = REFdata.ref_q_deg;
 				target_q = start_q + (float)Robot.Manualmode_data.Jog_value;
@@ -140,13 +161,13 @@ void Manual_Worker() {
 				state = 2;
 			}
 			break;
-		case 1:
+		case 1: // JOG state
 			QuinticTraj_P2P(start_q, target_q, 2.5f, Timer);
 			if (Timer >= 2.5f) {
 				state = 99;
 			}
 			break;
-		case 2:
+		case 2:  // Gripper state
 			if (Robot.Manualmode_data.gripper_sequence == Pick) Gripper_Control(1);
 			else if (Robot.Manualmode_data.gripper_sequence == Place) Gripper_Control(0);
 
@@ -160,7 +181,6 @@ void Manual_Worker() {
 			Robot.Manualmode_data.gripper_state = idle_gripper_state;
 			Robot.Manualmode_data.gripper_sequence = idle_gripper_sequence;
 			Robot.Manualmode_data.Jog_value = 0;
-
 			state = 0;
 			break;
 	}

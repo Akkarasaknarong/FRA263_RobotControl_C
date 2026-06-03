@@ -162,7 +162,9 @@ static void Modbus_frame_response(void)
     if (fc == 0x06 || fc == 0x10) {
         if (hMB->Txframe[0] == fc) {
             if (addr != 0x00) {
-            	Robot. Robot_Status = NOT_READY ;
+            	if (Robot.Robot_Status == READY){
+            		Robot.Robot_Status = NOT_READY ;
+            	}
             }
         }
     }

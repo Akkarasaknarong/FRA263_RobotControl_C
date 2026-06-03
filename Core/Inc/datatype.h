@@ -182,7 +182,7 @@ typedef struct {
 // P2P
 typedef struct {
 	unit_t unit;
-	uint16_t p2p_value ;
+	int16_t p2p_value ;
 } P2P_t ;
 typedef struct {
 	Pick_Place_t PickPlace;
