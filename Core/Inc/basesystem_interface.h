@@ -9,6 +9,7 @@
 #define INC_BASESYSTEM_INTERFACE_H_
 #include "datatype.h"
 
+// TEst
 typedef enum {
     AUTO_TYPE_NONE = 0,
     AUTO_TYPE_SEQUENCE,
