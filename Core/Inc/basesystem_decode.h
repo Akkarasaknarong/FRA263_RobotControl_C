@@ -45,8 +45,14 @@ extern u16u8_t reg[50];
 #define P2P_UNIT_REGISTER 0x23
 #define P2P_VALUE_REGISTER 0x24
 
+// Feedback Register
+#define POSITION_FEEDBACK_REGISTER 0x28
+#define VELOCITY_FEEDBACK_REGISTER 0x29
+#define ACCELERATION_FEEDBACK_REGISTER 0x30
+
 void Basesystem_decode_Init();
 void Basesystem_decode_Update();
+void Basesystem_Feedback();
 void Basesystem_Reset_register();
 
 #endif /* INC_BASESYSTEM_DECODE_H_ */

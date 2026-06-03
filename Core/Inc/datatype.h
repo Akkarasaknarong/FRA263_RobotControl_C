@@ -177,7 +177,7 @@ typedef struct {
 	Direction_t Direction[9] ;
 	uint8_t Number_of_target ;
 	GripperENA_t Gripper_Ena;
-	int8_t Gripper_sequence[10] ; // Gripper Sequence
+	int16_t Gripper_sequence[10] ; // Gripper Sequence
 } Pick_Place_t ;
 // P2P
 typedef struct {

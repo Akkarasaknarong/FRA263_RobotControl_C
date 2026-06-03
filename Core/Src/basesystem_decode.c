@@ -10,6 +10,7 @@
 #include "modbus.h"
 
 extern Robot_t Robot ;
+extern refTarget_t REFdata ;
 static u16u8_t* local_reg = {0};
 
 // Mode Selector Decode
@@ -64,7 +65,7 @@ void decode_automode(){
 	Robot.Automode_data.PickPlace.Gripper_sequence[8] = local_reg[SEQ9_REGISTER].I16;
 	Robot.Automode_data.PickPlace.Gripper_sequence[9] = local_reg[SEQ10_REGISTER].I16;
 	for (int i = 0; i < 10; i++) {
-	    int8_t seq_val = Robot.Automode_data.PickPlace.Gripper_sequence[i + 1];
+		int16_t seq_val = Robot.Automode_data.PickPlace.Gripper_sequence[i];
 	    if (seq_val < 0) {
 	        Robot.Automode_data.PickPlace.Direction[i] = CW;
 	    }
@@ -155,11 +156,6 @@ void decode_testmode(){
 	Robot.Testmode_data.Precision.repeat = abs(local_reg[TEST_REPEAT_REGISTER].I16) ;
 }
 
-//void decode_reset(){
-//	Robot.Manualmode_data.gripper_sequence = idle_gripper_sequence ;
-//	Robot.Manualmode_data.gripper_state = idle_gripper_state ;
-//}
-
 void Basesystem_decode_Init(){
 
 }
@@ -178,4 +174,14 @@ void Basesystem_decode_Update(){
 	decode_testmode();
 	decode_automode();
 }
+
+void Basesystem_Feedback(){
+	float ui_deg = fmodf(REFdata.ref_q_deg, 360.0f);
+	if (ui_deg < 0) ui_deg += 360.0f;
+	reg[POSITION_FEEDBACK_REGISTER].I16 = (int16_t)(REFdata.ref_q_deg * 10.0f);
+	reg[VELOCITY_FEEDBACK_REGISTER].I16 = (int16_t)(88 * 10.0f);
+	reg[ACCELERATION_FEEDBACK_REGISTER].I16 = (int16_t)(99 * 10.0f);
+
+}
+
 
