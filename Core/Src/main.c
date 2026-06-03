@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 
+#include <robot_worker.h>
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -36,7 +37,6 @@
 #include "datatype.h"
 #include "Init.h"
 #include "basesystem_decode.h"
-#include "Robot_Worker.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -75,8 +75,31 @@ PIDParam_t PIDparam = { .kp_pos = 1000000, .kd_pos = 0, .ki_pos = 0, .kp_vel = 1
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
-	.Robot_Status = Ready_recieve_Basesystem,
+	.Robot_Status = READY,
 	.Mode = Mode_IDLE,
+
+	.Automode_data = {
+		.PickPlace = { .Number_of_target = 0, .Gripper_Ena = GRIPPER_ENABLE },
+		.P2P = { .p2p_value = 0 }
+	},
+
+	.Manualmode_data = {
+		.gripper_state = idle_gripper_state,
+		.gripper_sequence = idle_gripper_sequence,
+		.Jog_value = 0
+	},
+
+	.Testmode_data = {
+		.Testtype = idle_testmode,
+		.Performance = { .Speed = 0, .Accel = 0 },
+		.Precision = { .Init_pos = 0, .Targ_pos = 0, .repeat = 0 }
+	},
+
+	.Feedback_data = {
+		.Current_Task = Idle,
+		.Emergency = EMERGENCY_DO_NOT_PRESS,
+		.Gripper = idle_gripper_state
+	},
 
 	.Monitor_data = {
 		.QEI = &QEIdata,
@@ -105,6 +128,14 @@ int state_machine = 1 ;
 
 int Selector_Modbus1_Matlab2 = 1; // Don't forget to change baudrate
 int SW_CascadeON1_CascadeOFF2 = 1;
+
+typedef struct {
+	int Up_out ;
+	int Down_out ;
+	int Close_out ;
+	int Open_out ;
+}Debug_t;
+Debug_t Debug = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -126,18 +157,12 @@ void Traj_Setup();
 void Init_Library();
 void Init_TIMER();
 void Quintic_List(int selec);
-void Gripper_Control_Blocking(int _CCommand);
-void Gripper_Control_NonBlocking(int _Command, float GP_Time);
-void Robot_Start();
 void P2P_Basesystem(float _q_start , float _q_final , float _t);
-int check_sum();
-
-void Automode_Update();
-void Manualmode_Update();
 
 void UART_Transmit();
 void UARTDMAConfig();
 void UART_Unpack();
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -195,6 +220,10 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		User_Interface_Start();
+		Debug.Up_out = HAL_GPIO_ReadPin(Gripper_Up_GPIO_Port, Gripper_Up_Pin);
+		Debug.Down_out = HAL_GPIO_ReadPin(Gripper_Down_GPIO_Port, Gripper_Down_Pin);
+		Debug.Close_out = HAL_GPIO_ReadPin(Gripper_Close_GPIO_Port, Gripper_Close_Pin);
+		Debug.Open_out = HAL_GPIO_ReadPin(Gripper_Open_GPIO_Port, Gripper_Open_Pin);
 	}
   /* USER CODE END 3 */
 }
@@ -753,11 +782,10 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &POS_CTRL_TIM) {
-		// Robot_Worker();
+		 Robot_Worker();
 
 		// Modbus MATLAB Selector
 		if (Selector_Modbus1_Matlab2 == 1){
-			Robot_Start();
 			Modbus_Protocal_Worker();
 			if (reg[REG_HEARTBEAT].U16 == HEARTBEAT_PC) {
 				reg[REG_HEARTBEAT].U16 = HEARTBEAT_ROBOT;
@@ -836,6 +864,7 @@ void Quintic_P2P(float _q_start , float _q_final , float _t){
 		state_machine++ ;
 	}
 }
+
 void Quintic_List(int selec) {
 	float t_slow = 3.25f;
 	float tar_deg = -360.0f;
@@ -903,24 +932,6 @@ void Quintic_List(int selec) {
 			state_machine = 1;
 		}
 	}
-}
-
-void Quintic_List_Basesystem(int N_pare) {
-
-}
-
-
-
-void Automode_Update(){
-
-}
-
-void Manualmode_Update(){
-
-}
-
-void Robot_Start() {
-
 }
 // ======================================================================= //
 /* USER CODE END 4 */

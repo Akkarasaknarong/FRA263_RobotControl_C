@@ -14,6 +14,8 @@ void Gripper_Group(int up, int down, int close, int open) {
 	HAL_GPIO_WritePin(Gripper_Open_GPIO_Port, Gripper_Open_Pin, open);
 }
 
+
+
 void Gripper_Control(int _Command) {
 	// 0 : Place
 	// 1 : Pick

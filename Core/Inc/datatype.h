@@ -240,7 +240,7 @@ typedef struct {
 // ======================================================================= //
 // Combine Robot struct
 typedef struct {
-	Robot_Status_t Robot_Status ; // Ready to Receive basesystem
+	Robot_Ready_t Robot_Status ; // Ready to Receive basesystem
 
 	RobotMode_t Mode;
 	Automode_t Automode_data ;

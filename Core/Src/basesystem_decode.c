@@ -23,7 +23,8 @@ typedef enum {
 	_up = 0 ,
 	_down = 1,
 	_open = 2,
-	_close = 4
+	_close = 4,
+	_gripper_state_idle = 99
 } gripper_state_t ;
 typedef enum {
 	_pick = 1 ,
@@ -113,7 +114,10 @@ void decode_manualmode(){
 		Robot.Manualmode_data.gripper_state = Open ;
 	} else if (local_reg[GRIPPER_STATE_REGISTER].U16 == _close){
 		Robot.Manualmode_data.gripper_state = Close ;
+	} else {
+		Robot.Manualmode_data.gripper_state = idle_gripper_state;
 	}
+
 
 	// Gripper sequences
 	if (local_reg[GRIPPER_SEQUENCE_REGISTER].U16 == _pick){
@@ -158,6 +162,13 @@ void decode_testmode(){
 
 void Basesystem_decode_Init(){
 
+}
+
+void Basesystem_Reset_register() {
+    for (int i = 0x02; i <= 0x24; i++) {
+        reg[i].U16 = 0;
+    }
+    reg[GRIPPER_STATE_REGISTER].U16 = 99;
 }
 
 void Basesystem_decode_Update(){

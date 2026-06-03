@@ -47,5 +47,6 @@ extern u16u8_t reg[50];
 
 void Basesystem_decode_Init();
 void Basesystem_decode_Update();
+void Basesystem_Reset_register();
 
 #endif /* INC_BASESYSTEM_DECODE_H_ */

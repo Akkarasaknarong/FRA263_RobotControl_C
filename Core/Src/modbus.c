@@ -160,27 +160,10 @@ static void Modbus_frame_response(void)
     }
 
     if (fc == 0x06 || fc == 0x10) {
-        // ถ้าระบบไม่ได้พ่น Error ออกมา (Txframe[0] ต้องเท่ากับ fc เดิม)
         if (hMB->Txframe[0] == fc) {
-
-            // 🌟 2. ดักไว้เลย! ถ้าไม่ใช่ Address 0x00 (Heartbeat) ถึงจะยอมยกธง
             if (addr != 0x00) {
-
-            	// Has New data
-//                Basesystem_Data.has_new_data = 1;
-//                Robot.robot_has_new_data_from_basesystem = 1;
-                if (Robot.Robot_Status == Ready_recieve_Basesystem){
-//                	   Robot.Data_from_Basesystem = have_data_Basesystem ;
-                }
-
-                // separate Auto | P2P, Sequence
-                if (addr >= 18 && addr <= 34) {
-//					Basesystem_Data._Auto.Type = AUTO_TYPE_SEQUENCE;
-				} else if (addr == 35 || addr == 36) {
-//					Basesystem_Data._Auto.Type = AUTO_TYPE_P2P;
-				}
+            	Robot. Robot_Status = NOT_READY ;
             }
-
         }
     }
 }

@@ -13,7 +13,7 @@ static float error_vel_prev = 0.0f;
 static float error_vel_sum  = 0.0f;
 static float PID_pos        = 0.0f;
 float Gain_R = 1.0f;
-float Gain_L = 0.12f;
+float Gain_L = 1.0f;
 
 typedef struct {
 	float kp_pos;
