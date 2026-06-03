@@ -1,5 +1,5 @@
+#include <basesystem_decode.h>
 #include "modbus.h"
-#include "basesystem_interface.h"
 
 static ModbusHandleTypedef *hMB;
 extern volatile uint8_t  dbg_crc_fail;
@@ -170,14 +170,14 @@ static void Modbus_frame_response(void)
 //                Basesystem_Data.has_new_data = 1;
 //                Robot.robot_has_new_data_from_basesystem = 1;
                 if (Robot.Robot_Status == Ready_recieve_Basesystem){
-                	   Robot.Data_from_Basesystem = have_data_Basesystem ;
+//                	   Robot.Data_from_Basesystem = have_data_Basesystem ;
                 }
 
                 // separate Auto | P2P, Sequence
                 if (addr >= 18 && addr <= 34) {
-					Basesystem_Data._Auto.Type = AUTO_TYPE_SEQUENCE;
+//					Basesystem_Data._Auto.Type = AUTO_TYPE_SEQUENCE;
 				} else if (addr == 35 || addr == 36) {
-					Basesystem_Data._Auto.Type = AUTO_TYPE_P2P;
+//					Basesystem_Data._Auto.Type = AUTO_TYPE_P2P;
 				}
             }
 

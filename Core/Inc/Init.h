@@ -10,6 +10,7 @@
 
 #include "stm32g4xx_hal.h"
 #include "datatype.h"
+#include "basesystem_decode.h"
 #include "main.h"
 
 extern TIM_HandleTypeDef htim3;
@@ -54,7 +55,7 @@ void Init_Library(){
 	Cabinet_State.rotary_sw = 0;
 
 	// Init Base System
-	Basesystem_Interface_Init();
+	Basesystem_decode_Init();
 
 	// Init Motor
 	MD20A_Init(&PWM_CH1_TIM, DIR_GPIO_Port, DIR_Pin);

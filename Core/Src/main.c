@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -30,13 +31,12 @@
 #include "md20a.h"
 #include "serial_frame.h"
 #include "modbus.h"
-#include "basesystem_interface.h"
 #include "User_Interface.h"
 #include "gripper.h"
 #include "datatype.h"
 #include "Init.h"
+#include "basesystem_decode.h"
 #include "Robot_Worker.h"
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -76,8 +76,6 @@ SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
 	.Robot_Status = Ready_recieve_Basesystem,
-	.Robot_Processing = Robot_Idle,
-	.Data_from_Basesystem = Do_not_have_data_Basesystem,
 	.Mode = Mode_IDLE,
 
 	.Monitor_data = {
@@ -755,7 +753,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &POS_CTRL_TIM) {
-		Robot_Worker();
+		// Robot_Worker();
 
 		// Modbus MATLAB Selector
 		if (Selector_Modbus1_Matlab2 == 1){
@@ -764,7 +762,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			if (reg[REG_HEARTBEAT].U16 == HEARTBEAT_PC) {
 				reg[REG_HEARTBEAT].U16 = HEARTBEAT_ROBOT;
 			}
-			Basesystem_Interface_Decode(reg);
+			 Basesystem_decode_Update();
 		} else if (Selector_Modbus1_Matlab2 == 2){
 			UART_Transmit();
 		}
@@ -908,185 +906,21 @@ void Quintic_List(int selec) {
 }
 
 void Quintic_List_Basesystem(int N_pare) {
-	float t_slow = 1.2f;
-	float t_fast = 1.25f;
-	float t_break = 2.0f;
 
-	float p0 = IndexToDegree(Basesystem_Data._Auto.Sequence[0]);
-	float p1 = IndexToDegree(Basesystem_Data._Auto.Sequence[1]);
-	float p2 = IndexToDegree(Basesystem_Data._Auto.Sequence[2]);
-	float p3 = IndexToDegree(Basesystem_Data._Auto.Sequence[3]);
-	float p4 = IndexToDegree(Basesystem_Data._Auto.Sequence[4]);
-	float p5 = IndexToDegree(Basesystem_Data._Auto.Sequence[5]);
-	float p6 = IndexToDegree(Basesystem_Data._Auto.Sequence[6]);
-	float p7 = IndexToDegree(Basesystem_Data._Auto.Sequence[7]);
-	float p8 = IndexToDegree(Basesystem_Data._Auto.Sequence[8]);
-	float p9 = IndexToDegree(Basesystem_Data._Auto.Sequence[9]);
-
-	float tar = 180.0f ;
-	if (N_pare == 1) {
-		if (state_machine == 1) Quintic_P2P(0, 0, t_break); 		// Go Pick 1
-		else if (state_machine == 2) Quintic_P2P(0, tar, t_slow);	// Pick 1
-		else if (state_machine == 3) Quintic_P2P(tar, tar, t_break);	// Go Place 1
-		else if (state_machine == 4) Quintic_P2P(tar, 0, t_slow);	// Place 1
-		else if (state_machine == 5) Quintic_P2P(0, 0, t_break);
-		else if (state_machine == 6) {Robot.Robot_Processing = Robot_Complete ;}
-	}
-
-	else if (N_pare == 2) {
-		if (state_machine == 1) Quintic_P2P(0, p0, t_fast); 		// Go Pick 1
-		else if (state_machine == 2) Quintic_P2P(p0, p0, t_break);	// Pick 1
-		else if (state_machine == 3) Quintic_P2P(p0, p1, t_slow);	// Go Place 1
-		else if (state_machine == 4) Quintic_P2P(p1, p1, t_break);	// Place 1
-
-		else if (state_machine == 5) Quintic_P2P(p1, p2, t_fast);	// Go Pick 2
-		else if (state_machine == 6) Quintic_P2P(p2, p2, t_break);	// Pick 2
-		else if (state_machine == 7) Quintic_P2P(p2, p3, t_slow);	// Go Place 2
-		else if (state_machine == 8) Quintic_P2P(p3, p3, t_break);	// Place 2
-		else if (state_machine == 9) Quintic_P2P(p3, 0, t_slow);	// Place 2
-		else if (state_machine == 10) {Robot.Robot_Processing = Robot_Complete ;}
-	}
-
-	else if (N_pare == 3) {
-		if (state_machine == 1) Quintic_P2P(0, p0, t_fast); 		// Go Pick 1
-		else if (state_machine == 2) Quintic_P2P(p0, p0, t_break);
-		else if (state_machine == 3) Quintic_P2P(p0, p1, t_slow);
-		else if (state_machine == 4) Quintic_P2P(p1, p1, t_break);
-
-		else if (state_machine == 5) Quintic_P2P(p1, p2, t_fast);	// Go Pick 2
-		else if (state_machine == 6) Quintic_P2P(p2, p2, t_break);
-		else if (state_machine == 7) Quintic_P2P(p2, p3, t_slow);
-		else if (state_machine == 8) Quintic_P2P(p3, p3, t_break);
-
-		else if (state_machine == 9) Quintic_P2P(p3, p4, t_fast);	// Go Pick 3
-		else if (state_machine == 10) Quintic_P2P(p4, p4, t_break);	// Pick 3
-		else if (state_machine == 11) Quintic_P2P(p4, p5, t_slow);	// Go Place 3
-		else if (state_machine == 12) Quintic_P2P(p5, p5, t_break);	// Place 3
-		else if (state_machine == 13) Quintic_P2P(p5, 0, t_slow);
-		else if (state_machine == 14) {Robot.Robot_Processing = Robot_Complete ;}
-	}
-
-	else if (N_pare == 4) {
-		if (state_machine == 1) Quintic_P2P(0, p0, t_fast);
-		else if (state_machine == 2) Quintic_P2P(p0, p0, t_break);
-		else if (state_machine == 3) Quintic_P2P(p0, p1, t_slow);
-		else if (state_machine == 4) Quintic_P2P(p1, p1, t_break);
-
-		else if (state_machine == 5) Quintic_P2P(p1, p2, t_fast);
-		else if (state_machine == 6) Quintic_P2P(p2, p2, t_break);
-		else if (state_machine == 7) Quintic_P2P(p2, p3, t_slow);
-		else if (state_machine == 8) Quintic_P2P(p3, p3, t_break);
-
-		else if (state_machine == 9) Quintic_P2P(p3, p4, t_fast);
-		else if (state_machine == 10) Quintic_P2P(p4, p4, t_break);
-		else if (state_machine == 11) Quintic_P2P(p4, p5, t_slow);
-		else if (state_machine == 12) Quintic_P2P(p5, p5, t_break);
-
-		else if (state_machine == 13) Quintic_P2P(p5, p6, t_fast);	// Go Pick 4
-		else if (state_machine == 14) Quintic_P2P(p6, p6, t_break);	// Pick 4
-		else if (state_machine == 15) Quintic_P2P(p6, p7, t_slow);	// Go Place 4
-		else if (state_machine == 16) Quintic_P2P(p7, p7, t_break);	// Place 4
-		else if (state_machine == 17) Quintic_P2P(p7, 0, t_slow);	// Place 4
-		else if (state_machine == 18) {Robot.Robot_Processing = Robot_Complete ;}
-	}
-
-	else if (N_pare == 5) {
-		if (state_machine == 1) Quintic_P2P(0, p0, t_fast);
-		else if (state_machine == 2) Quintic_P2P(p0, p0, t_break);
-		else if (state_machine == 3) Quintic_P2P(p0, p1, t_slow);
-		else if (state_machine == 4) Quintic_P2P(p1, p1, t_break);
-
-		else if (state_machine == 5) Quintic_P2P(p1, p2, t_fast);
-		else if (state_machine == 6) Quintic_P2P(p2, p2, t_break);
-		else if (state_machine == 7) Quintic_P2P(p2, p3, t_slow);
-		else if (state_machine == 8) Quintic_P2P(p3, p3, t_break);
-
-		else if (state_machine == 9) Quintic_P2P(p3, p4, t_fast);
-		else if (state_machine == 10) Quintic_P2P(p4, p4, t_break);
-		else if (state_machine == 11) Quintic_P2P(p4, p5, t_slow);
-		else if (state_machine == 12) Quintic_P2P(p5, p5, t_break);
-
-		else if (state_machine == 13) Quintic_P2P(p5, p6, t_fast);
-		else if (state_machine == 14) Quintic_P2P(p6, p6, t_break);
-		else if (state_machine == 15) Quintic_P2P(p6, p7, t_slow);
-		else if (state_machine == 16) Quintic_P2P(p7, p7, t_break);
-
-		else if (state_machine == 17) Quintic_P2P(p7, p8, t_fast);	// Go Pick 5
-		else if (state_machine == 18) Quintic_P2P(p8, p8, t_break);	// Pick 5
-		else if (state_machine == 19) Quintic_P2P(p8, p9, t_slow);	// Go Place 5
-		else if (state_machine == 20) Quintic_P2P(p9, p9, t_break);	// Place 5
-		else if (state_machine == 21) Quintic_P2P(p9, p9, t_break);	// Place 5
-		else if (state_machine == 22) {Robot.Robot_Processing = Robot_Complete ;}
-	}
 }
 
 
 
 void Automode_Update(){
-	if (Basesystem_Data.Mode == Mode_AUTO) {
-		if (Basesystem_Data._Auto.Type == AUTO_TYPE_SEQUENCE){
-			int count = Basesystem_Data._Auto.N_pare;
-			if (count == 1) {
-				Quintic_List_Basesystem(1);
-			} else if (count == 2) {
-				Quintic_List_Basesystem(2);
-			} else if (count == 3) {
-				Quintic_List_Basesystem(3);
-			} else if (count == 4) {
-				Quintic_List_Basesystem(4);
-			} else if (count == 5) {
-				Quintic_List_Basesystem(5);
-			}
-		}
-		else if (Basesystem_Data._Auto.Type == AUTO_TYPE_P2P){
-			if (Basesystem_Data._Auto.P2P.unit == 1) // Unit Index
-			{
-				REFdata.ref_q = IndexToRadian(Basesystem_Data._Auto.P2P.value);
-			} else if (Basesystem_Data._Auto.P2P.unit == 0) // Unit Degree
-			{
-				REFdata.ref_q = DegreeToRadian(Basesystem_Data._Auto.P2P.value);
-			}
-			Basesystem_Data.has_new_data = 0 ;
-		}
-		}
+
 }
 
 void Manualmode_Update(){
-	if (Basesystem_Data.Mode == Mode_MANUAL){
-		int gp_pin_state = Basesystem_Data._Manual.Gripper_pin_state ;
-		if (gp_pin_state == 0)
-			Gripper_Group(1,0,0,0);
-		if (gp_pin_state == 1)
-			Gripper_Group(0,1,0,0);
-		if (gp_pin_state == 2)
-			Gripper_Group(0,0,0,1);
-		if (gp_pin_state == 4)
-			Gripper_Group(0,0,1,0);
 
-		int gp_command = Basesystem_Data._Manual.Gripper_command ;
-		if (gp_command == 1) // Pick
-			Gripper_Control(1);
-		if (gp_command == 2) // Place
-			Gripper_Control(0);
-
-		int Jog = Basesystem_Data._Manual.Jog_val ;
-		REFdata.ref_q += DegreeToRadian(Jog);
-		Basesystem_Data._Manual.Jog_val = 0 ;
-	}
 }
-// ======================================================================= //
-// === Operating base system ===
+
 void Robot_Start() {
-//	if (Basesystem_Data.has_new_data == 1) {
-//		Timer = 0.0f;
-//		state_machine = 1;
-//		Basesystem_Data.has_new_data = 2;
-//	}
-//	if (Basesystem_Data.has_new_data == 2){
-//		 Automode_Update();
-////		 Manualmode_Update();
-//	}
-//	Basesystem_Interface_Feedback();
+
 }
 // ======================================================================= //
 /* USER CODE END 4 */

@@ -48,6 +48,7 @@ typedef enum {
 
 // Gripper State
 typedef enum {
+	idle_gripper_state,
 	Up,
 	Down,
 	Close,
@@ -56,6 +57,7 @@ typedef enum {
 
 // Gripper Sequenc
 typedef enum {
+	idle_gripper_sequence,
 	Pick,
 	Place
 }Gripper_sequence_t;
@@ -130,6 +132,7 @@ typedef struct {
 // Datatype U16 U8
 typedef union {
     uint16_t U16;
+    int16_t  I16;
     uint8_t  U8[2];
 } u16u8_t;
 
@@ -153,22 +156,34 @@ typedef enum {
 	Robot_Complete
 } Robot_Process_t ;
 
+
+
+
+
 // ======================================================================= //
 // Combine all data in Robot
 // ======================================================================= //
+// Automode struct
+typedef enum {
+	CCW ,
+	CW
+} Direction_t ;
+typedef enum {
+	GRIPPER_ENABLE = 0,
+	GRIPPER_DISENABLE = 1
+}GripperENA_t ;
 // Pick and Place
 typedef struct {
+	Direction_t Direction[9] ;
 	uint8_t Number_of_target ;
-	Gripper_sequence_t Gripper_sequence ; // Gripper Sequence
-	uint8_t Gripper_Ena;
+	GripperENA_t Gripper_Ena;
+	int8_t Gripper_sequence[10] ; // Gripper Sequence
 } Pick_Place_t ;
-// Picl Place
+// P2P
 typedef struct {
-	uint8_t unit;
+	unit_t unit;
 	uint16_t p2p_value ;
 } P2P_t ;
-
-// Automode struct
 typedef struct {
 	Pick_Place_t PickPlace;
 	P2P_t P2P ;
@@ -178,23 +193,28 @@ typedef struct {
 typedef struct {
 	Gripper_t gripper_state; // up down close open
 	Gripper_sequence_t gripper_sequence ; // pick place
-	uint16_t Jog_value; // unit degeree
+	int16_t Jog_value; // unit degeree
 } Manualmode_t ;
 // ======================================================================= //
-typedef struct {
-	uint8_t Speed ;
-	uint8_t Accel ;
-} Performance_t ;
+// Testmode struct
+typedef enum {
+	Precision_test = 0,
+	 Performance_test = 1,
+	 idle_testmode
+} Testtype_t ;
 
 typedef struct {
-	uint8_t unit ;
+	int8_t Speed ;
+	int8_t Accel ;
+} Performance_t ;
+typedef struct {
+	unit_t unit ;
 	uint16_t Init_pos ;
 	uint16_t Targ_pos ;
-	uint8_t repeat ;
+	int8_t repeat ;
 } Precision_t ;
-
-// Testmode struct
 typedef struct {
+	Testtype_t Testtype ;
 	Performance_t Performance ;
 	Precision_t Precision;
 } Testmode_t ;
@@ -213,11 +233,14 @@ typedef struct {
 	SSErrorstruct_t *SSErr;
 } Monitors_t ;
 // ======================================================================= //
+
+
+
+
+// ======================================================================= //
 // Combine Robot struct
 typedef struct {
 	Robot_Status_t Robot_Status ; // Ready to Receive basesystem
-	Robot_Process_t Robot_Processing; // Robot Processing state
-	Data_from_Basesystem_t Data_from_Basesystem; // Have data from basesystem
 
 	RobotMode_t Mode;
 	Automode_t Automode_data ;
