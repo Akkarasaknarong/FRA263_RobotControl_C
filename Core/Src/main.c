@@ -151,18 +151,12 @@ static void MX_TIM17_Init(void);
 static void MX_TIM7_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-void Motor_QEIUpdate();
-void MD20A_Control(int pwm);
-void Traj_Setup();
 void Init_Library();
 void Init_TIMER();
-void Quintic_List(int selec);
-void P2P_Basesystem(float _q_start , float _q_final , float _t);
 
 void UART_Transmit();
 void UARTDMAConfig();
 void UART_Unpack();
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -827,8 +821,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		Timer += 0.0002 ;
 
 		if (Selector_Modbus1_Matlab2 == 2){
-			// Quintic List Tuning (Local Path)
-			 Quintic_List(2);
+		// Quintic List Tuning (Local Path)
+
 		}
 
 		// QEI
@@ -851,85 +845,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	if (huart == &STLINK_UART) {
 		if (Selector_Modbus1_Matlab2 == 2){
 			UART_Unpack();
-		}
-	}
-}
-
-void Quintic_P2P(float _q_start , float _q_final , float _t){
-	QuinticTraj_Init(_q_start, _q_final, _t);
-	QuinticTraj_Compute(Timer,&REFdata.ref_q,&REFdata.ref_qd,&REFdata.ref_qdd);
-
-	if (Timer >= _t){
-		Timer = 0 ;
-		state_machine++ ;
-	}
-}
-
-void Quintic_List(int selec) {
-	float t_slow = 3.25f;
-	float tar_deg = -360.0f;
-
-	float t_fast = 3.25f;
-	float t_break = 2.0f ;
-
-
-	// Rotate
-	if (selec == 1){
-		if (state_machine == 1){
-			Quintic_P2P(0,360,t_slow);
-		} else if (state_machine == 2) {
-			Quintic_P2P(360,360,t_break);
-		} else if (state_machine == 3) {
-			Quintic_P2P(360,0,t_fast);
-
-		} else if (state_machine == 4) {
-			Quintic_P2P(0,0,t_break);
-		} else if (state_machine == 5) {
-			Quintic_P2P(0,270,t_slow);
-		} else if (state_machine == 6) {
-			Quintic_P2P(270,270,t_break);
-		} else if (state_machine == 7) {
-			Quintic_P2P(270,0,t_fast);
-		}
-
-		else if (state_machine == 8) {
-			Quintic_P2P(0, 0, t_break);
-		} else if (state_machine == 9) {
-			Quintic_P2P(0, 180, t_slow);
-		} else if (state_machine == 10) {
-			Quintic_P2P(180, 180, t_break);
-		} else if (state_machine == 11) {
-			Quintic_P2P(180, 0, t_fast);
-		}
-
-		else if (state_machine == 12) {
-			Quintic_P2P(0, 0, t_break);
-		} else if (state_machine == 13) {
-			Quintic_P2P(0, 90, t_slow);
-		} else if (state_machine == 14) {
-			Quintic_P2P(90, 90, t_break);
-		} else if (state_machine == 15) {
-			Quintic_P2P(90, 0, t_fast);
-		}
-	}
-
-	// Rotate with Pick Place
-	if (selec == 2) {
-		if (state_machine == 1) {
-			Quintic_P2P(0, 0, t_break);
-		}
-		if (state_machine == 2) {
-			Quintic_P2P(0, tar_deg, t_slow);
-		}
-		if (state_machine == 3) {
-			Quintic_P2P(tar_deg, tar_deg, t_break);
-		}
-		if (state_machine == 4) {
-			Quintic_P2P(tar_deg, 0, t_slow);
-
-		}
-		if (state_machine == 5) {
-			state_machine = 1;
 		}
 	}
 }

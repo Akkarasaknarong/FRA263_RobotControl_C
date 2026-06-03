@@ -9,6 +9,7 @@
 #define INC_ROBOT_WORKER_H_
 #include "datatype.h"
 
+extern float Timer ;
 extern Robot_t Robot ;
 void Robot_Worker();
 
