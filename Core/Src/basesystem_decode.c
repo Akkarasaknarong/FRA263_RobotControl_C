@@ -161,10 +161,19 @@ void Basesystem_decode_Init(){
 }
 
 void Basesystem_Reset_register() {
-    for (int i = 0x02; i <= 0x24; i++) {
-        reg[i].U16 = 0;
-    }
-    reg[GRIPPER_STATE_REGISTER].U16 = 99;
+	reg[JOG_VALUE_REGISTER].I16 = 0;
+	reg[GRIPPER_SEQUENCE_REGISTER].U16 = 0;
+	reg[GRIPPER_STATE_REGISTER].U16 = 99;
+
+	reg[P2P_VALUE_REGISTER].I16 = 0;
+	reg[N_PARE_REGISTER].I16 = 0;
+
+	reg[TEST_REPEAT_REGISTER].I16 = 0;
+
+//    for (int i = 0x02; i <= 0x25; i++) {
+//        reg[i].U16 = 0;
+//    }
+//    reg[GRIPPER_STATE_REGISTER].U16 = 99;
 }
 
 void Basesystem_decode_Update(){

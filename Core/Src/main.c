@@ -17,8 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-
-#include <robot_worker.h>
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -37,6 +35,7 @@
 #include "datatype.h"
 #include "Init.h"
 #include "basesystem_decode.h"
+#include "robot_worker.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -777,6 +776,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &POS_CTRL_TIM) {
 		 Robot_Worker();
+		 Basesystem_decode_Update();
 
 		// Modbus MATLAB Selector
 		if (Selector_Modbus1_Matlab2 == 1){
@@ -784,7 +784,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			if (reg[REG_HEARTBEAT].U16 == HEARTBEAT_PC) {
 				reg[REG_HEARTBEAT].U16 = HEARTBEAT_ROBOT;
 			}
-			 Basesystem_decode_Update();
+
 		} else if (Selector_Modbus1_Matlab2 == 2){
 			UART_Transmit();
 		}
