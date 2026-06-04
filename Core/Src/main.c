@@ -70,7 +70,7 @@ refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
 KALMANstruct_t ESTdata = { 0 };
-PIDParam_t PIDparam = { .kp_pos = 1000000, .kd_pos = 0, .ki_pos = 0, .kp_vel = 1, .kd_vel = 0, .ki_vel = 0 };
+PIDParam_t PIDparam = { .kp_pos = 990000, .kd_pos = 0, .ki_pos = 0, .kp_vel = 0.6, .kd_vel =0, .ki_vel = 0 };
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
@@ -777,23 +777,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &POS_CTRL_TIM) {
 		 Robot_Worker();
 		 Basesystem_decode_Update();
-
 		// Modbus MATLAB Selector
 		if (Selector_Modbus1_Matlab2 == 1){
 			Modbus_Protocal_Worker();
 			if (reg[REG_HEARTBEAT].U16 == HEARTBEAT_PC) {
 				reg[REG_HEARTBEAT].U16 = HEARTBEAT_ROBOT;
 			}
-
 		} else if (Selector_Modbus1_Matlab2 == 2){
 			UART_Transmit();
 		}
-
-
 		// Pos Control
 		if (SW_CascadeON1_CascadeOFF2 == 1){
 			Pos_ctrl_Tunning(PIDparam.kp_pos, PIDparam.kd_pos, PIDparam.ki_pos);
-			Pos_ctrl_Compute(REFdata.ref_q, ESTdata.q_est);
+			Pos_ctrl_Compute(DegreeToRadian(REFdata.ref_q_deg), ESTdata.q_est);
 		}
 	}
 
@@ -802,15 +798,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			// Vel Control
 			Vel_ctrl_Tunning(PIDparam.kp_vel, PIDparam.kd_vel, PIDparam.ki_vel);
 			Vel_ctrl_Compute(REFdata.ref_qd , ESTdata.qd_est,&PWM_PID);
-
 			// Disturbance FFW
 			Motor_Disturbance_feedforward_Update(ESTdata.load_est,&V_DFFW);
 			PWM_DFFW = V_DFFW * (65535.0f / 24.0f);
-
 			// Refference FFW
 			Motor_Ref_feedforward_Update(REFdata.ref_qd,&V_FF);
 			PWM_FF = V_FF * (65535.0f / 24.0f);
-
 			// PWM Output
 			MD20A_Control(PWM_FF+PWM_PID);
 		}
@@ -819,18 +812,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &QEI_UPDATE_TIM) {
 		// Global Timer
 		Timer += 0.0002 ;
-
-		if (Selector_Modbus1_Matlab2 == 2){
-		// Quintic List Tuning (Local Path)
-
-		}
-
 		// QEI
 		QEI_Update();
-
 		// Kalman
 		Motor_Kalman_Update(V_FF, QEIdata.q, &ESTdata.q_est, &ESTdata.qd_est, &ESTdata.load_est, &ESTdata.i_est);
-
 		// Monitor Steady state Error
 		SSErrordata.q_ss = REFdata.ref_q - QEIdata.q ;
 		SSErrordata.qd_ss = REFdata.ref_qd - QEIdata.qd ;

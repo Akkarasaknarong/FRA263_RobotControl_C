@@ -10,6 +10,28 @@
 #include "gripper.h"
 #include "quintic_traj.h"
 #include <math.h>
+extern PIDParam_t PIDparam;
+
+void Apply_PID_Tuning(float target_deg) {
+    float mod_deg = fmodf(target_deg, 360.0f);
+    if (mod_deg < 0) mod_deg += 360.0f;
+
+    PIDparam.kd_pos = 0.0f;
+    PIDparam.ki_pos = 0.0f;
+    PIDparam.kp_vel = 0.6f;
+    PIDparam.kd_vel = 0.0f;
+    PIDparam.ki_vel = 0.0f;
+
+    if (mod_deg <= 90.0f) {
+        PIDparam.kp_pos = 1000000.0f;
+    }
+    else if (mod_deg <= 180.0f) {
+        PIDparam.kp_pos = 950000.0f;
+    }
+    else {
+        PIDparam.kp_pos = 990000.0f;
+    }
+}
 
 float Remap_CW_CCW(Direction_t _Direction, float _Target_q_deg, float _Start_q_deg) {
     float current_mod = fmodf(_Start_q_deg, 360.0f);
@@ -48,6 +70,8 @@ void Auto_Worker() {
 				start_q = REFdata.ref_q_deg;
 				target_q = start_q + IndexToDegree((float)Robot.Automode_data.P2P.p2p_value);
 			}
+
+			Apply_PID_Tuning(target_q);
 			Timer = 0;
 			state_auto = 88;
 		}
@@ -79,9 +103,11 @@ void Auto_Worker() {
 					target_q = Remap_CW_CCW(Robot.Automode_data.PickPlace.Direction[current_PickPlace], raw_target, start_q);
 				}
 				if (current_PickPlace % 2 == 0)
-					target_t = 3.0f; // 1.25f sec
+					target_t = 3.25f; // 1.25f sec
 				else
-					target_t = 3.0f; // 3.25f sec
+					target_t = 3.25f; // 3.25f sec
+
+				Apply_PID_Tuning(target_q);
 				Timer = 0;
 				state_auto = 1;
 			}

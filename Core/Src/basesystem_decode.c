@@ -65,11 +65,15 @@ void decode_automode(){
 	Robot.Automode_data.PickPlace.Gripper_sequence[8] = local_reg[SEQ9_REGISTER].I16;
 	Robot.Automode_data.PickPlace.Gripper_sequence[9] = local_reg[SEQ10_REGISTER].I16;
 	for (int i = 0; i < 10; i++) {
-		int16_t seq_val = Robot.Automode_data.PickPlace.Gripper_sequence[i];
-	    if (seq_val < 0) {
+	    int16_t seq_val = local_reg[SEQ1_REGISTER + i].I16;
+
+	    if (seq_val == 0) {
 	        Robot.Automode_data.PickPlace.Direction[i] = CW;
 	    }
-	    else if (seq_val > 0) {
+	    else if (seq_val < 0) {
+	        Robot.Automode_data.PickPlace.Direction[i] = CW;
+	    }
+	    else {
 	        Robot.Automode_data.PickPlace.Direction[i] = CCW;
 	    }
 	}
