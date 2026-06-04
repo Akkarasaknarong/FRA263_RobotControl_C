@@ -103,7 +103,7 @@ void Auto_Worker() {
 					target_q = Remap_CW_CCW(Robot.Automode_data.PickPlace.Direction[current_PickPlace], raw_target, start_q);
 				}
 				if (current_PickPlace % 2 == 0)
-					target_t = 3.25f; // 1.25f sec
+					target_t = 1.3f; // 1.25f sec
 				else
 					target_t = 3.25f; // 3.25f sec
 
