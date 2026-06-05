@@ -9,8 +9,8 @@
 #define INC_QUINTIC_TRAJ_H_
 
 #include "datatype.h"
-extern refTarget_t REFdata ;
 
-uint8_t QuinticTraj_P2P(float q_start, float q_final, float total_time, float current_time);
+void QuinticTraj_Init(float start_point, float end_point , float time);
+void QuinticTraj_Compute(float curr_time ,float* q ,float* qd ,float* qdd );
 
 #endif /* INC_QUINTIC_TRAJ_H_ */

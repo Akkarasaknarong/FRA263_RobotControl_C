@@ -39,17 +39,17 @@ void QuinticTraj_Init(float q0, float qf , float tend){
 	t_end = tend ;
 }
 
-void QuinticTraj_Compute(float t){
+void QuinticTraj_Compute(float t ,float* q ,float* qd ,float* qdd ){
 	if (t == 0.0f){
-		REFdata.ref_q = q_0 ;
-		REFdata.ref_qd = 0.0f ;
-		REFdata.ref_qdd = 0.0f ;
+		*q = q_0 ;
+		*qd = 0.0f ;
+		*qdd = 0.0f ;
 		return;
 	}
 	if (t >= t_end){
-		REFdata.ref_q = q_f;
-		REFdata.ref_qd = 0.0f ;
-		REFdata.ref_qdd = 0.0f ;
+		*q = q_f;
+		*qd = 0.0f ;
+		*qdd = 0.0f ;
 		return ;
 	}
 
@@ -58,19 +58,9 @@ void QuinticTraj_Compute(float t){
 	float t4 = t*t*t*t ;
 	float t5 = t*t*t*t*t ;
 
-	REFdata.ref_q = (a0) + (a1*t) + (a2*t2) + (a3*t3) + (a4*t4) + (a5*t5);
-	REFdata.ref_qd = (a1) + (2.0f*a2*t) + (3.0f*a3*t2) + (4.0f*a4*t3) + (5.0f*a5*t4);
-	REFdata.ref_qdd = (2.0f*a2) + (6.0f*a3*t) + (12.0f*a4*t2) + (20.0f*a5*t3);
-}
-
-uint8_t QuinticTraj_P2P(float q_start, float q_final, float total_time, float current_time) {
-    QuinticTraj_Init(q_start, q_final, total_time);
-    QuinticTraj_Compute(current_time);
-
-    if (current_time >= total_time) {
-        return 1;
-    }
-    return 0;
+	*q = (a0) + (a1*t) + (a2*t2) + (a3*t3) + (a4*t4) + (a5*t5);
+	*qd = (a1) + (2.0f*a2*t) + (3.0f*a3*t2) + (4.0f*a4*t3) + (5.0f*a5*t4);
+	*qdd = (2.0f*a2) + (6.0f*a3*t) + (12.0f*a4*t2) + (20.0f*a5*t3);
 }
 
 
