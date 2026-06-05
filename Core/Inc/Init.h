@@ -72,9 +72,9 @@ void Init_Library(){
 
 	// Init Cascade
 	Pos_ctrl_Init();
-	Pos_ctrl_Tunning(100000, 5000, 5000);
+	// Pos_ctrl_Tunning(100000, 5000, 5000);
 	Vel_ctrl_Init();
-	Vel_ctrl_Tunning(1, 0, 0);
+	// Vel_ctrl_Tunning(1, 0, 0);
 
 	// Init Serial Frame
 	SerialFrame_Init(&STLINK_UART_frame, &STLINK_UART);
@@ -86,7 +86,7 @@ void Init_Library(){
 	hmodbus.htim = &MODBUS_TIM;
 	hmodbus.slaveAddress = MODBUS_SLAVE_ADDRESS;
 	hmodbus.RegisterSize = MODBUS_REGISTER_COUNT;
-	Modbus_init(&hmodbus, reg);
+	//Modbus_init(&hmodbus, reg);
 }
 
 #endif /* INC_INIT_H_ */

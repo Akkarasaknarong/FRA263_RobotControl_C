@@ -156,6 +156,7 @@ static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 void Init_Library();
 void Init_TIMER();
+void IO_Debugger() ;
 
 void UART_Transmit();
 void UARTDMAConfig();
@@ -217,13 +218,6 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		User_Interface_Start();
-		Debug_Gripper.Up_out = HAL_GPIO_ReadPin(Gripper_Up_GPIO_Port, Gripper_Up_Pin);
-		Debug_Gripper.Down_out = HAL_GPIO_ReadPin(Gripper_Down_GPIO_Port, Gripper_Down_Pin);
-		Debug_Gripper.Close_out = HAL_GPIO_ReadPin(Gripper_Close_GPIO_Port, Gripper_Close_Pin);
-		Debug_Gripper.Open_out = HAL_GPIO_ReadPin(Gripper_Open_GPIO_Port, Gripper_Open_Pin);
-		Debug_ReedSW.Reed_Close = HAL_GPIO_ReadPin(Reed_SW_Close_GPIO_Port, Reed_SW_Close_Pin);
-		Debug_ReedSW.Reed_Down = HAL_GPIO_ReadPin(Reed_SW_Down_GPIO_Port, Reed_SW_Down_Pin);
-		Debug_ReedSW.Reed_Up = HAL_GPIO_ReadPin(Reed_SW_Up_GPIO_Port, Reed_SW_Up_Pin);
 	}
   /* USER CODE END 3 */
 }
@@ -611,10 +605,10 @@ static void MX_USART2_UART_Init(void)
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
-  huart2.Init.BaudRate = 230400;
-  huart2.Init.WordLength = UART_WORDLENGTH_9B;
+  huart2.Init.BaudRate = 2000000;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
   huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_EVEN;
+  huart2.Init.Parity = UART_PARITY_NONE;
   huart2.Init.Mode = UART_MODE_TX_RX;
   huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart2.Init.OverSampling = UART_OVERSAMPLING_16;
@@ -790,13 +784,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &POS_CTRL_TIM) {
 
 		// Robot Worker
-		Robot_Worker();
-		// Modbus Decode
-		Modbus_Protocal_Worker();
-		// Basesystem Decode
-		Basesystem_decode_Update();
-		// UART
-		// UART_Transmit();
+		// Robot_Worker();
+		 UART_Transmit();
 
 		if (reg[REG_HEARTBEAT].U16 == HEARTBEAT_PC) {
 			reg[REG_HEARTBEAT].U16 = HEARTBEAT_ROBOT;
@@ -842,6 +831,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	if (huart == &STLINK_UART) {
 		// UART_Unpack();
 	}
+}
+
+void IO_Debugger(){
+	Debug_Gripper.Up_out = HAL_GPIO_ReadPin(Gripper_Up_GPIO_Port, Gripper_Up_Pin);
+	Debug_Gripper.Down_out = HAL_GPIO_ReadPin(Gripper_Down_GPIO_Port, Gripper_Down_Pin);
+	Debug_Gripper.Close_out = HAL_GPIO_ReadPin(Gripper_Close_GPIO_Port, Gripper_Close_Pin);
+	Debug_Gripper.Open_out = HAL_GPIO_ReadPin(Gripper_Open_GPIO_Port, Gripper_Open_Pin);
+	Debug_ReedSW.Reed_Close = HAL_GPIO_ReadPin(Reed_SW_Close_GPIO_Port, Reed_SW_Close_Pin);
+	Debug_ReedSW.Reed_Down = HAL_GPIO_ReadPin(Reed_SW_Down_GPIO_Port, Reed_SW_Down_Pin);
+	Debug_ReedSW.Reed_Up = HAL_GPIO_ReadPin(Reed_SW_Up_GPIO_Port, Reed_SW_Up_Pin);
 }
 // ======================================================================= //
 /* USER CODE END 4 */
