@@ -125,9 +125,6 @@ volatile uint8_t dbg_worker_state = 0;
 float Timer = 0 ;
 int state_machine = 1 ;
 
-int Selector_Modbus1_Matlab2 = 1; // Don't forget to change baudrate
-int SW_CascadeON1_CascadeOFF2 = 1;
-
 typedef struct {
 	int Up_out ;
 	int Down_out ;
@@ -220,12 +217,10 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		User_Interface_Start();
-
 		Debug_Gripper.Up_out = HAL_GPIO_ReadPin(Gripper_Up_GPIO_Port, Gripper_Up_Pin);
 		Debug_Gripper.Down_out = HAL_GPIO_ReadPin(Gripper_Down_GPIO_Port, Gripper_Down_Pin);
 		Debug_Gripper.Close_out = HAL_GPIO_ReadPin(Gripper_Close_GPIO_Port, Gripper_Close_Pin);
 		Debug_Gripper.Open_out = HAL_GPIO_ReadPin(Gripper_Open_GPIO_Port, Gripper_Open_Pin);
-
 		Debug_ReedSW.Reed_Close = HAL_GPIO_ReadPin(Reed_SW_Close_GPIO_Port, Reed_SW_Close_Pin);
 		Debug_ReedSW.Reed_Down = HAL_GPIO_ReadPin(Reed_SW_Down_GPIO_Port, Reed_SW_Down_Pin);
 		Debug_ReedSW.Reed_Up = HAL_GPIO_ReadPin(Reed_SW_Up_GPIO_Port, Reed_SW_Up_Pin);
@@ -348,7 +343,7 @@ static void MX_TIM6_Init(void)
   htim6.Instance = TIM6;
   htim6.Init.Prescaler = 169;
   htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim6.Init.Period = 999;
+  htim6.Init.Period = 3999;
   htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
   {
@@ -845,9 +840,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	if (huart == &STLINK_UART) {
-		if (Selector_Modbus1_Matlab2 == 2){
-			UART_Unpack();
-		}
+		// UART_Unpack();
 	}
 }
 // ======================================================================= //

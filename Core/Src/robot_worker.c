@@ -23,13 +23,13 @@ void Apply_PID_Tuning(float target_deg) {
     PIDparam.ki_vel = 0.0f;
 
     if (mod_deg <= 90.0f) {
-        PIDparam.kp_pos = 1000000.0f;
+        PIDparam.kp_pos = 1000.0f;
     }
     else if (mod_deg <= 180.0f) {
-        PIDparam.kp_pos = 950000.0f;
+        PIDparam.kp_pos = 1000.0f;
     }
     else {
-        PIDparam.kp_pos = 990000.0f;
+        PIDparam.kp_pos = 1000.0f;
     }
 }
 
