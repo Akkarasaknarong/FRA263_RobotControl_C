@@ -49,30 +49,34 @@ void Pos_ctrl_Compute(float ref_pos, float cur_pos) {
     float I_pos = PIDparam.ki_pos * error_pos_sum;
     float D_pos = PIDparam.kd_pos * (error_pos - error_pos_prev) / POSITION_CONTROL_FREQ;
     PID_pos = P_pos + I_pos + D_pos;
+
     error_pos_sum += error_pos * POSITION_CONTROL_FREQ;
+    // Anti-windup
+	if      (error_pos_sum >  I_POS_LIMIT) error_pos_sum =  I_POS_LIMIT;
+	else if (error_pos_sum < -I_POS_LIMIT) error_pos_sum = -I_POS_LIMIT;
+
     error_pos_prev = error_pos;
 }
 
 void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
+    if      (PID_pos >  MAX_VELOCITY) PID_pos =  MAX_VELOCITY;
+    else if (PID_pos < -MAX_VELOCITY) PID_pos = -MAX_VELOCITY;
+
     float error_vel = PID_pos + ref_vel - cur_vel;
     float P_vel = PIDparam.kp_vel * error_vel;
     float I_vel = PIDparam.ki_vel * error_vel_sum;
     float D_vel = PIDparam.kd_vel * (error_vel - error_vel_prev) / VELOCITY_CONTROL_FREQ;
+
     error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
+    // Anti-windup
+    if      (error_vel_sum >  I_VEL_LIMIT) error_vel_sum =  I_VEL_LIMIT;
+    else if (error_vel_sum < -I_VEL_LIMIT) error_vel_sum = -I_VEL_LIMIT;
+
     error_vel_prev = error_vel;
 
-    float Output = P_vel + I_vel + D_vel ;
-
-    if (Output > 0){ // Rotate Left
-    	Output = Output * Gain_L ;
-    }
-    else if (Output < 0) { // Rotate Right
-		Output = Output * Gain_R ;
-	}
-    else if (Output == 0) { // Rotate Right
-		Output = Output;
-	}
+    float Output = P_vel + I_vel + D_vel;
+    if      (Output > 0) Output = Output * Gain_L;
+    else if (Output < 0) Output = Output * Gain_R;
 
     *PWM_PID_out = Output;
 }
-

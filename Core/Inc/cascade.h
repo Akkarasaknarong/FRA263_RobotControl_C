@@ -10,6 +10,9 @@
 
 #define POSITION_CONTROL_FREQ 0.001 // 1000Hz
 #define VELOCITY_CONTROL_FREQ 0.0004 // 2500Hz
+#define MAX_VELOCITY 3.8 // approximately
+#define I_POS_LIMIT      4.0f    // rad/s
+#define I_VEL_LIMIT      20000.0f  // PWM
 
 extern float Gain_L ;
 extern float Gain_R ;
