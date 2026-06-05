@@ -13,24 +13,24 @@
 extern PIDParam_t PIDparam;
 
 void Apply_PID_Tuning(float target_deg) {
-    float mod_deg = fmodf(target_deg, 360.0f);
-    if (mod_deg < 0) mod_deg += 360.0f;
-
-    PIDparam.kd_pos = 0.0f;
-    PIDparam.ki_pos = 0.0f;
-    PIDparam.kp_vel = 0.6f;
-    PIDparam.kd_vel = 0.0f;
-    PIDparam.ki_vel = 0.0f;
-
-    if (mod_deg <= 90.0f) {
-        PIDparam.kp_pos = 1000.0f;
-    }
-    else if (mod_deg <= 180.0f) {
-        PIDparam.kp_pos = 1000.0f;
-    }
-    else {
-        PIDparam.kp_pos = 1000.0f;
-    }
+//    float mod_deg = fmodf(target_deg, 360.0f);
+//    if (mod_deg < 0) mod_deg += 360.0f;
+//
+//    PIDparam.kd_pos = 0.0f;
+//    PIDparam.ki_pos = 0.0f;
+//    PIDparam.kp_vel = 0.6f;
+//    PIDparam.kd_vel = 0.0f;
+//    PIDparam.ki_vel = 0.0f;
+//
+//    if (mod_deg <= 90.0f) {
+//        PIDparam.kp_pos = 1000.0f;
+//    }
+//    else if (mod_deg <= 180.0f) {
+//        PIDparam.kp_pos = 1000.0f;
+//    }
+//    else {
+//        PIDparam.kp_pos = 1000.0f;
+//    }
 }
 
 float Remap_CW_CCW(Direction_t _Direction, float _Target_q_deg, float _Start_q_deg) {
