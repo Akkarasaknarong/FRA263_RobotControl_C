@@ -66,11 +66,12 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
+static int last_state = -1;
 refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
 KALMANstruct_t ESTdata = { 0 };
-PIDParam_t PIDparam = { .kp_pos = 5000, .kd_pos = 0, .ki_pos = 0, .kp_vel = 0.6, .kd_vel =0, .ki_vel = 0 };
+PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 600, .kp_vel = 800.0f, .kd_vel =0, .ki_vel = 0 };
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
@@ -139,6 +140,20 @@ typedef struct {
 	int Reed_Close ;
 }DebugReedSwitch_t;
 DebugReedSwitch_t Debug_ReedSW = {0};
+
+typedef struct {
+	float _q_pos ;
+	float _q_vel ;
+	float _q_load ;
+	float _q_i ;
+	float _r;
+}Kalman_param_t;
+Kalman_param_t Kalmanparam = { ._q_pos = 1,
+							   ._q_vel = 1e-01,
+							   ._q_load = 10,
+							   ._q_i = 1e-01,
+							   ._r = 1e-20};
+int TH = 5000;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -221,6 +236,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		User_Interface_Start();
+		// MD20A_Control(TH);
 	}
   /* USER CODE END 3 */
 }
@@ -764,11 +780,13 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void UART_Transmit(){
-	SerialFrame_AddPayload(&STLINK_UART_frame, &QEIdata.q, sizeof(float));
+	float est_q_deg  = RadianToDegree(ESTdata.q_est);
+
+	SerialFrame_AddPayload(&STLINK_UART_frame, &QEIdata.q_deg, sizeof(float));
 	SerialFrame_AddPayload(&STLINK_UART_frame, &QEIdata.qd, sizeof(float));
-	SerialFrame_AddPayload(&STLINK_UART_frame, &ESTdata.q_est, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &est_q_deg, sizeof(float));
 	SerialFrame_AddPayload(&STLINK_UART_frame, &ESTdata.qd_est, sizeof(float));
-	SerialFrame_AddPayload(&STLINK_UART_frame, &REFdata.ref_q, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &REFdata.ref_q_deg, sizeof(float));
 	SerialFrame_AddPayload(&STLINK_UART_frame, &REFdata.ref_qd, sizeof(float));
 	SerialFrame_AddPayload(&STLINK_UART_frame, &Timer, sizeof(float));
 	SerialFrame_Transmit(&STLINK_UART_frame); // 2Header + 2Single
@@ -814,9 +832,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	}
 
 	if (htim == &QEI_UPDATE_TIM) {
+		// Quintic list
+		Quintic_List(2);
 		// Global Timer
 		Timer += 0.0002 ;
 		// QEI
+		Motor_Kalman_Tunning(Kalmanparam._q_pos, Kalmanparam._q_vel, Kalmanparam._q_load, Kalmanparam._q_i, Kalmanparam._r);
 		QEI_Update();
 		// Kalman
 		Motor_Kalman_Update(V_FF, QEIdata.q, &ESTdata.q_est, &ESTdata.qd_est, &ESTdata.load_est, &ESTdata.i_est);
@@ -836,20 +857,24 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 	}
 }
 
-void Quintic_P2P(float _q_start , float _q_final , float _t){
-	QuinticTraj_Init(_q_start, _q_final, _t);
-	QuinticTraj_Compute(Timer,&REFdata.ref_q,&REFdata.ref_qd,&REFdata.ref_qdd);
+void Quintic_P2P(float _q_start, float _q_final, float _t) {
+    if (state_machine != last_state) {
+        QuinticTraj_Init(_q_start, _q_final, _t);
+        last_state = state_machine;
+    }
+    QuinticTraj_Compute(Timer, &REFdata.ref_q, &REFdata.ref_qd, &REFdata.ref_qdd);
 
-	if (Timer >= _t){
-		Timer = 0 ;
-		state_machine++ ;
-	}
+    if (Timer >= _t) {
+        Timer = 0;
+        state_machine++;
+    }
 }
 
 void Quintic_List(int selec) {
 	float t_slow = 3.5f;
 	float t_fast = 3.5f;
 	float t_break = 2.0f ;
+	float tar_q = 180.0f;
 
 	// Rotate
 	if (selec == 1){
@@ -894,16 +919,19 @@ void Quintic_List(int selec) {
 	// Rotate with Pick Place
 	if (selec == 2) {
 		if (state_machine == 1) {
-			Quintic_P2P(0, 180, t_slow);
+			Quintic_P2P(0, tar_q, t_slow);
 		}
 		if (state_machine == 2) {
-			Quintic_P2P(180, 180, t_break);
+			Quintic_P2P(tar_q, tar_q, t_break);
 		}
 		if (state_machine == 3) {
-			Quintic_P2P(180, 0, t_slow);
+			Quintic_P2P(tar_q, 0, t_slow);
 		}
 		if (state_machine == 4) {
 			Quintic_P2P(0, 0, t_break);
+		}
+		if (state_machine == 5) {
+			state_machine = 1 ;
 		}
 	}
 }

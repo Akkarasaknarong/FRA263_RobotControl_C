@@ -6,6 +6,8 @@
  */
 
 #include "cascade.h"
+extern refTarget_t REFdata ;
+extern QEIstruct_t QEIdata ;
 
 static float error_pos_prev = 0.0f;
 static float error_pos_sum  = 0.0f;
@@ -14,15 +16,6 @@ static float error_vel_sum  = 0.0f;
 static float PID_pos        = 0.0f;
 float Gain_R = 1.0f;
 float Gain_L = 1.0f;
-
-typedef struct {
-	float kp_pos;
-	float kd_pos ;
-	float ki_pos ;
-	float kp_vel;
-	float kd_vel ;
-	float ki_vel ;
-} PIDParam_t;
 static PIDParam_t PIDparam = {0};
 
 void Pos_ctrl_Init() {
@@ -78,5 +71,13 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
     if      (Output > 0) Output = Output * Gain_L;
     else if (Output < 0) Output = Output * Gain_R;
 
-    *PWM_PID_out = Output;
+
+    float friction_comp = 0;
+    float pos_error = REFdata.ref_q - QEIdata.q;
+    if (fabsf(pos_error) > POS_DEADZONE) {
+        if      (pos_error  >  FRICTION_VEL_THRESH) friction_comp =  FRICTION_COMP;
+        else if (pos_error  < -FRICTION_VEL_THRESH) friction_comp = -FRICTION_COMP;
+    }
+
+    *PWM_PID_out = Output + friction_comp;
 }
