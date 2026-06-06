@@ -8,6 +8,7 @@
 #include "cascade.h"
 extern refTarget_t REFdata ;
 extern QEIstruct_t QEIdata ;
+extern KALMANstruct_t ESTdata;
 
 static float error_pos_prev = 0.0f;
 static float error_pos_sum  = 0.0f;
@@ -16,6 +17,7 @@ static float error_vel_sum  = 0.0f;
 static float PID_pos        = 0.0f;
 float Gain_R = 1.0f;
 float Gain_L = 1.0f;
+
 static PIDParam_t PIDparam = {0};
 
 void Pos_ctrl_Init() {
@@ -61,6 +63,7 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
     float D_vel = PIDparam.kd_vel * (error_vel - error_vel_prev) / VELOCITY_CONTROL_FREQ;
 
     error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
+
     // Anti-windup
     if      (error_vel_sum >  I_VEL_LIMIT) error_vel_sum =  I_VEL_LIMIT;
     else if (error_vel_sum < -I_VEL_LIMIT) error_vel_sum = -I_VEL_LIMIT;
@@ -71,19 +74,21 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
     if      (Output > 0) Output = Output * Gain_L;
     else if (Output < 0) Output = Output * Gain_R;
 
+    // Friction FFW
+    float pos_error    = REFdata.ref_q_deg - QEIdata.q_deg;
+    float cur_vel_abs  = fabsf(ESTdata.qd_est);
+    float pwm_friction_ffw = 0.0f;
 
-    float friction_comp = 0;
-    float pos_error = REFdata.ref_q - QEIdata.q;
-
-//    if (fabsf(pos_error) > POS_DEADZONE) {
-//        if      (pos_error  >  FRICTION_VEL_THRESH) friction_comp =  FRICTION_COMP;
-//        else if (pos_error  < -FRICTION_VEL_THRESH) friction_comp = -FRICTION_COMP;
-//    }
-
-    if (fabsf(pos_error) > POS_DEADZONE) {
-        if      (pos_error > 0) friction_comp =  FRICTION_COMP;
-        else if (pos_error < 0) friction_comp = -FRICTION_COMP;
+    if (cur_vel_abs < FFW_VEL_GATE) {
+        if (pos_error > FFW_DEAD_DEG && pos_error < FFW_MAX_DEG) {
+            float ratio = (pos_error - FFW_DEAD_DEG) / (FFW_MAX_DEG - FFW_DEAD_DEG);
+            pwm_friction_ffw = PWM_FRICTION_COMP * ratio;
+        }
+        else if (pos_error < -FFW_DEAD_DEG && pos_error > -FFW_MAX_DEG) {
+            float ratio = (-pos_error - FFW_DEAD_DEG) / (FFW_MAX_DEG - FFW_DEAD_DEG);
+            pwm_friction_ffw = -PWM_FRICTION_COMP * ratio;
+        }
     }
 
-    *PWM_PID_out = Output + friction_comp;
+    *PWM_PID_out = Output + pwm_friction_ffw;
 }

@@ -71,7 +71,7 @@ refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
 KALMANstruct_t ESTdata = { 0 };
-PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 600, .kp_vel = 800.0f, .kd_vel =0, .ki_vel = 0 };
+PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 0, .kp_vel = 400.0f, .kd_vel =0, .ki_vel = 0 };
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
@@ -236,7 +236,6 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		User_Interface_Start();
-		// MD20A_Control(TH);
 	}
   /* USER CODE END 3 */
 }
