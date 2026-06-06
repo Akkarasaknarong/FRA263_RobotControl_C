@@ -54,5 +54,6 @@ void Basesystem_decode_Init();
 void Basesystem_decode_Update();
 void Basesystem_Feedback();
 void Basesystem_Reset_register();
+float map_to_0_360(float angle_infinity);
 
 #endif /* INC_BASESYSTEM_DECODE_H_ */

@@ -150,6 +150,11 @@ typedef struct {
 	int _JW_Homing ;
 }DebugJoystick_t;
 DebugJoystick_t Debug_Joystick = {0};
+
+float TB_Pos = 0 ;
+int TB_Reed = 0 ;
+int TB_Current_robot_task = 0 ;
+int TB_safety_state = 0 ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -246,14 +251,12 @@ int main(void)
 		Debug_Joystick._JW_Rotate_Right = HAL_GPIO_ReadPin(JS_Rotate_Right_GPIO_Port, JS_Rotate_Right_Pin);
 		Debug_Joystick._JW_Homing = HAL_GPIO_ReadPin(JS_HOME_GPIO_Port, JS_HOME_Pin);
 
-//		if (Debug_Joystick._JW_Rotate_Left == 0){
-//			MD20A_Control(10000);
-//		}else if (Debug_Joystick._JW_Rotate_Right == 0){
-//			MD20A_Control(-10000);
-//		}
-
-  /* USER CODE END 3 */
-}
+		reg[POSITION_FEEDBACK_REGISTER].U16 = map_to_0_360(TB_Pos) * 10;
+		reg[0x26].U16 = TB_Reed;
+		reg[0x27].U16 = TB_Current_robot_task;
+		reg[0x31].U16 = TB_safety_state;
+		/* USER CODE END 3 */
+	}
 }
 
 /**

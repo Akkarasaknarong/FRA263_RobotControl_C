@@ -11,6 +11,7 @@
 #include "quintic_traj.h"
 #include <math.h>
 extern PIDParam_t PIDparam;
+//extern u16u8_t reg[MODBUS_REGISTER_COUNT];
 
 void Apply_PID_Tuning(float target_deg) {
 //    float mod_deg = fmodf(target_deg, 360.0f);
@@ -79,7 +80,7 @@ void Auto_Worker() {
 			state_auto = 0 ;
 		}
 		break;
-	case 0:	// Automode sequence : Init Trajactory State
+		case 0:	// Automode sequence : Init Trajactory State
 			if (Robot.Automode_data.PickPlace.Number_of_target == 0) {
 				current_PickPlace = 0;
 				state_auto = 99;

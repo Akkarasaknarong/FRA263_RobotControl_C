@@ -42,6 +42,14 @@ typedef enum {
 	_GRIPPER_DISENABLE = 0
 }gripperENA_t ;
 
+float map_to_0_360(float angle_infinity) {
+    float angle_mod = fmodf(angle_infinity, 360.0f);
+    if (angle_mod < 0.0f) {
+        angle_mod += 360.0f;
+    }
+    return angle_mod;
+}
+
 void decode_modeselector(){
 	int8_t mode_check = local_reg[MODE_SELECTER_REGISTER].I16;
 	if (mode_check == _auto_mode)
@@ -189,10 +197,8 @@ void Basesystem_decode_Update(){
 }
 
 void Basesystem_Feedback(){
-	float ui_deg = fmodf(REFdata.ref_q_deg, 360.0f);
-	if (ui_deg < 0) ui_deg += 360.0f;
 	reg[POSITION_FEEDBACK_REGISTER].I16 = (int16_t)(REFdata.ref_q_deg * 10.0f);
-	reg[VELOCITY_FEEDBACK_REGISTER].I16 = (int16_t)(88 * 10.0f);
+	reg[VELOCITY_FEEDBACK_REGISTER].I16 = map_to_0_360(REFdata.ref_q_deg * 10.0f);
 	reg[ACCELERATION_FEEDBACK_REGISTER].I16 = (int16_t)(99 * 10.0f);
 
 }
