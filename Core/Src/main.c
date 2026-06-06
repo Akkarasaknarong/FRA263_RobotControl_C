@@ -66,6 +66,7 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
+// Add tuninng when gripper state
 static int last_state = -1;
 refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
