@@ -61,7 +61,7 @@ void Auto_Worker() {
 	static uint32_t gripper_start_tick = 0;
 
 	switch (state_auto) {
-	case -1:
+	case -1: // Check P2P mode
 		if (Robot.Automode_data.P2P.p2p_value != 0){
 			if(Robot.Automode_data.P2P.unit == deg){
 				start_q = REFdata.ref_q_deg;
@@ -75,11 +75,11 @@ void Auto_Worker() {
 			Timer = 0;
 			state_auto = 88;
 		}
-		else {
+		else { // Check Auto sequence mode
 			state_auto = 0 ;
 		}
 		break;
-	case 0:	// Init Trajactory State
+	case 0:	// Automode sequence : Init Trajactory State
 			if (Robot.Automode_data.PickPlace.Number_of_target == 0) {
 				current_PickPlace = 0;
 				state_auto = 99;
@@ -113,7 +113,7 @@ void Auto_Worker() {
 			}
 			break;
 
-		case 1: // Trajactory State
+		case 1: // Automode sequence : Trajactory State
 			QuinticTraj_P2P(start_q, target_q, target_t, Timer);
 			if (Timer > target_t) {
 				if (Robot.Automode_data.PickPlace.Gripper_Ena == GRIPPER_ENABLE) {
@@ -212,6 +212,148 @@ void Manual_Worker() {
 	}
 }
 
+void Test_Worker(){
+	/*
+		case 0: init and check Testmode Type
+		case 1: Precision Test (Go to init_pos)
+		case 2: wait (t_wait) sec
+		case 3: Precision Test (Init position to Target Position)
+		case 4: wait (t_wait) sec
+		case 5: Precision Test (Target Position to Init position)
+		case 6: wait (t_wait) sec
+
+		case 21: Perfornance Test
+		case 22:
+		case 23:
+		case 24:
+		case 25:
+
+		case 99: End Switch caseห
+	 */
+
+	static uint8_t state_test = 0 ;
+	static int repeat ;
+	static int repeat_count = 0 ;
+	static int init_pos ;
+	static int targ_pos ;
+	static float start_q ;
+
+	static float t_go_init = 2.0f ;
+	static float t_go_front = 3.25f ;
+	static float t_go_back = 3.25f ;
+	static float t_wait = 1.0f ;
+
+	switch (state_test) {
+		case 0:
+			if (Robot.Testmode_data.Testtype == Precision_test){
+				start_q = REFdata.ref_q_deg;
+				repeat = Robot.Testmode_data.Precision.repeat ;
+				init_pos = Robot.Testmode_data.Precision.Init_pos ;
+				targ_pos = Robot.Testmode_data.Precision.Targ_pos ;
+				repeat_count = 0;
+				Timer = 0;
+				state_test = 1;
+			} else if (Robot.Testmode_data.Testtype == Performance_test) {
+				start_q = REFdata.ref_q_deg;
+				Timer = 0;
+				state_test = 21;
+			}
+			break;
+		case 1:
+			QuinticTraj_P2P(start_q, init_pos, t_go_init, Timer);
+			if (Timer > t_go_init){
+				Timer = 0 ;
+				state_test = 2 ;
+			}
+			break;
+		case 2:
+			if (Timer > t_wait){
+				Timer = 0 ;
+				state_test = 3 ;
+			}
+			break;
+		case 3:
+			QuinticTraj_P2P(init_pos, targ_pos, t_go_front, Timer);
+			if (Timer > t_go_front){
+				Timer = 0 ;
+				state_test = 4 ;
+			}
+			break;
+		case 4:
+			if (Timer > t_wait){
+				Timer = 0 ;
+				state_test = 5 ;
+			}
+			break ;
+		case 5 :
+			QuinticTraj_P2P(targ_pos, init_pos, t_go_back, Timer);
+			if (Timer > t_go_back){
+				Timer = 0 ;
+				state_test = 6 ;
+			}
+			break ;
+		case 6:
+			if (Timer > t_wait){
+				Timer = 0 ;
+				state_test = 3 ;
+				repeat_count ++ ;
+				if (repeat_count >= repeat){
+					state_test = 99 ;
+				}
+			}
+			break ;
+
+
+
+		case 21:
+			QuinticTraj_P2P(start_q, 0, t_go_init, Timer);
+			if (Timer > t_go_init){
+				Timer = 0 ;
+				state_test = 22 ;
+			}
+			break;
+		case 22:
+			if (Timer > t_wait){
+				Timer = 0 ;
+				state_test = 23 ;
+			}
+			break ;
+		case 23:
+			QuinticTraj_P2P(0, 360, 1.4, Timer);
+			if (Timer > 1.4){
+				Timer = 0 ;
+				state_test = 24 ;
+			}
+			break;
+		case 24:
+			if (Timer > t_wait){
+				Timer = 0 ;
+				state_test = 25 ;
+			}
+			break ;
+		case 25:
+			QuinticTraj_P2P(360, 0, 1.4, Timer);
+			if (Timer > 1.4){
+				Timer = 0 ;
+				state_test = 26 ;
+			}
+			break;
+		case 26:
+			if (Timer > t_wait){
+				Timer = 0 ;
+				state_test = 99 ;
+			}
+			break ;
+
+		case 99:
+			Basesystem_Reset_register();
+			Robot.Robot_Status = READY;
+			state_test = 0 ;
+			repeat_count = 0;
+			break;
+	}
+}
+
 void Robot_Worker() {
 	if (Robot.Robot_Status == NOT_READY){
 		if (Robot.Mode == Mode_MANUAL){
@@ -219,6 +361,9 @@ void Robot_Worker() {
 		}
 		else if (Robot.Mode == Mode_AUTO) {
 			Auto_Worker();
+		}
+		else if (Robot.Mode == Mode_TEST) {
+			Test_Worker();
 		}
 	}
 	Basesystem_Feedback();
