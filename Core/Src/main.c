@@ -139,6 +139,17 @@ typedef struct {
 	int Reed_Close ;
 }DebugReedSwitch_t;
 DebugReedSwitch_t Debug_ReedSW = {0};
+
+typedef struct {
+	int _JW_Emergency ;
+	int _JW_Updown ;
+	int _JW_Openclose;
+	int _JW_Reset ;
+	int _JW_Rotate_Right;
+	int _JW_Rotate_Left ;
+	int _JW_Homing ;
+}DebugJoystick_t;
+DebugJoystick_t Debug_Joystick = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -217,15 +228,32 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		User_Interface_Start();
+
 		Debug_Gripper.Up_out = HAL_GPIO_ReadPin(Gripper_Up_GPIO_Port, Gripper_Up_Pin);
 		Debug_Gripper.Down_out = HAL_GPIO_ReadPin(Gripper_Down_GPIO_Port, Gripper_Down_Pin);
 		Debug_Gripper.Close_out = HAL_GPIO_ReadPin(Gripper_Close_GPIO_Port, Gripper_Close_Pin);
+
 		Debug_Gripper.Open_out = HAL_GPIO_ReadPin(Gripper_Open_GPIO_Port, Gripper_Open_Pin);
 		Debug_ReedSW.Reed_Close = HAL_GPIO_ReadPin(Reed_SW_Close_GPIO_Port, Reed_SW_Close_Pin);
 		Debug_ReedSW.Reed_Down = HAL_GPIO_ReadPin(Reed_SW_Down_GPIO_Port, Reed_SW_Down_Pin);
 		Debug_ReedSW.Reed_Up = HAL_GPIO_ReadPin(Reed_SW_Up_GPIO_Port, Reed_SW_Up_Pin);
-	}
+
+		Debug_Joystick._JW_Emergency = HAL_GPIO_ReadPin(JS_EMERGENCY_GPIO_Port, JS_EMERGENCY_Pin);
+		Debug_Joystick._JW_Reset = HAL_GPIO_ReadPin(JS_RESET_GPIO_Port, JS_RESET_Pin);
+		Debug_Joystick._JW_Openclose = HAL_GPIO_ReadPin(JS_OpenClose_GPIO_Port, JS_OpenClose_Pin);
+		Debug_Joystick._JW_Updown = HAL_GPIO_ReadPin(JS_Updown_GPIO_Port, JS_Updown_Pin);
+		Debug_Joystick._JW_Rotate_Left = HAL_GPIO_ReadPin(JS_Rotate_Left_GPIO_Port, JS_Rotate_Left_Pin);
+		Debug_Joystick._JW_Rotate_Right = HAL_GPIO_ReadPin(JS_Rotate_Right_GPIO_Port, JS_Rotate_Right_Pin);
+		Debug_Joystick._JW_Homing = HAL_GPIO_ReadPin(JS_HOME_GPIO_Port, JS_HOME_Pin);
+
+//		if (Debug_Joystick._JW_Rotate_Left == 0){
+//			MD20A_Control(10000);
+//		}else if (Debug_Joystick._JW_Rotate_Right == 0){
+//			MD20A_Control(-10000);
+//		}
+
   /* USER CODE END 3 */
+}
 }
 
 /**
@@ -716,19 +744,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : JS_Rotate_Right_Pin JS_RESET_Pin JS_Updown_Pin JS_OpenClose_Pin
-                           MODE_SELECTOR_Pin */
-  GPIO_InitStruct.Pin = JS_Rotate_Right_Pin|JS_RESET_Pin|JS_Updown_Pin|JS_OpenClose_Pin
-                          |MODE_SELECTOR_Pin;
+  /*Configure GPIO pins : JS_Rotate_Right_Pin JS_RESET_Pin JS_EMERGENCY_Pin JS_Updown_Pin
+                           JS_OpenClose_Pin MODE_SELECTOR_Pin */
+  GPIO_InitStruct.Pin = JS_Rotate_Right_Pin|JS_RESET_Pin|JS_EMERGENCY_Pin|JS_Updown_Pin
+                          |JS_OpenClose_Pin|MODE_SELECTOR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : JS_EMERGENCY_Pin */
-  GPIO_InitStruct.Pin = JS_EMERGENCY_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(JS_EMERGENCY_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : DIR_Pin Gripper_Open_Pin Gripper_Close_Pin Gripper_Down_Pin */
   GPIO_InitStruct.Pin = DIR_Pin|Gripper_Open_Pin|Gripper_Close_Pin|Gripper_Down_Pin;

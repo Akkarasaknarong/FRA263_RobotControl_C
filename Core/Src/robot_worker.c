@@ -234,8 +234,8 @@ void Test_Worker(){
 	static uint8_t state_test = 0 ;
 	static int repeat ;
 	static int repeat_count = 0 ;
-	static int init_pos ;
-	static int targ_pos ;
+	static float init_pos ;
+	static float targ_pos ;
 	static float start_q ;
 
 	static float t_go_init = 2.0f ;
@@ -247,9 +247,15 @@ void Test_Worker(){
 		case 0:
 			if (Robot.Testmode_data.Testtype == Precision_test){
 				start_q = REFdata.ref_q_deg;
+
+				if (Robot.Testmode_data.Precision.unit == idx){
+					init_pos = IndexToDegree(Robot.Testmode_data.Precision.Init_pos) ;
+					targ_pos = IndexToDegree(Robot.Testmode_data.Precision.Targ_pos) ;
+				} else if (Robot.Testmode_data.Precision.unit == deg){
+					init_pos = Robot.Testmode_data.Precision.Init_pos ;
+					targ_pos = Robot.Testmode_data.Precision.Targ_pos ;
+				}
 				repeat = Robot.Testmode_data.Precision.repeat ;
-				init_pos = Robot.Testmode_data.Precision.Init_pos ;
-				targ_pos = Robot.Testmode_data.Precision.Targ_pos ;
 				repeat_count = 0;
 				Timer = 0;
 				state_test = 1;
@@ -319,7 +325,7 @@ void Test_Worker(){
 			}
 			break ;
 		case 23:
-			QuinticTraj_P2P(0, 360, 1.4, Timer);
+			QuinticTraj_P2P(0, 360, 1.4f, Timer);
 			if (Timer > 1.4){
 				Timer = 0 ;
 				state_test = 24 ;
@@ -332,7 +338,7 @@ void Test_Worker(){
 			}
 			break ;
 		case 25:
-			QuinticTraj_P2P(360, 0, 1.4, Timer);
+			QuinticTraj_P2P(360, 0, 1.4f, Timer);
 			if (Timer > 1.4){
 				Timer = 0 ;
 				state_test = 26 ;
