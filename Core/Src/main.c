@@ -71,7 +71,7 @@ refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
 KALMANstruct_t ESTdata = { 0 };
-PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 0, .kp_vel = 400.0f, .kd_vel =0, .ki_vel = 0 };
+PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 50, .kp_vel = 400.0f, .kd_vel =0, .ki_vel = 0 };
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
@@ -133,14 +133,12 @@ typedef struct {
 	int Open_out ;
 }DebugGripper_t;
 DebugGripper_t Debug_Gripper = {0};
-
 typedef struct {
 	int Reed_Up ;
 	int Reed_Down ;
 	int Reed_Close ;
 }DebugReedSwitch_t;
 DebugReedSwitch_t Debug_ReedSW = {0};
-
 typedef struct {
 	float _q_pos ;
 	float _q_vel ;
@@ -154,6 +152,8 @@ Kalman_param_t Kalmanparam = { ._q_pos = 1,
 							   ._q_i = 1e-01,
 							   ._r = 1e-20};
 float PWM_Out = 0 ;
+PIDDebug_t PIDDebug = {0};
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

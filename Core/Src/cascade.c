@@ -9,6 +9,7 @@
 extern refTarget_t REFdata ;
 extern QEIstruct_t QEIdata ;
 extern KALMANstruct_t ESTdata;
+extern PIDDebug_t PIDDebug;
 
 static float error_pos_prev = 0.0f;
 static float error_pos_sum  = 0.0f;
@@ -51,6 +52,11 @@ void Pos_ctrl_Compute(float ref_pos, float cur_pos) {
 	else if (error_pos_sum < -I_POS_LIMIT) error_pos_sum = -I_POS_LIMIT;
 
     error_pos_prev = error_pos;
+
+    PIDDebug.pid_pos = PID_pos ;
+    PIDDebug.p_pos = P_pos ;
+    PIDDebug.i_pos = I_pos ;
+    PIDDebug.d_pos = D_pos ;
 }
 
 void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
@@ -91,4 +97,10 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
     }
 
     *PWM_PID_out = Output + pwm_friction_ffw;
+
+    PIDDebug.pid_vel = Output ;
+	PIDDebug.p_vel = P_vel ;
+	PIDDebug.i_vel = I_vel ;
+	PIDDebug.d_vel = D_vel ;
+	PIDDebug.friction_ffw = pwm_friction_ffw ;
 }

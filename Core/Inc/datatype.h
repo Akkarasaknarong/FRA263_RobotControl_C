@@ -17,6 +17,18 @@
 // ======================================================================= //
 // Robot Status
 // ======================================================================= //
+typedef struct {
+	float pid_pos ;
+	float p_pos ;
+	float i_pos ;
+	float d_pos ;
+	float pid_vel ;
+	float p_vel ;
+	float i_vel;
+	float d_vel ;
+	float friction_ffw ;
+}PIDDebug_t;
+
 // Current Task
 typedef enum {
 	Homing,
