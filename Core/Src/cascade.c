@@ -72,17 +72,23 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
     float error_vel = PID_pos + ref_vel - cur_vel;
 
     if ((error_vel > 0 && error_vel_prev < 0) ||
-		(error_vel < 0 && error_vel_prev > 0)) {
-		error_vel_sum = 0.0f;
-	}
+        (error_vel < 0 && error_vel_prev > 0)) {
+        error_vel_sum = 0.0f;
+    }
 
     float P_vel = PIDparam.kp_vel * error_vel;
     float I_vel = PIDparam.ki_vel * error_vel_sum;
     float D_vel = PIDparam.kd_vel * (error_vel - error_vel_prev) / VELOCITY_CONTROL_FREQ;
 
-    error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
+    float pos_error   = REFdata.ref_q_deg - QEIdata.q_deg;
+    float cur_vel_abs = fabsf(ESTdata.qd_est);
+    uint8_t joint_stuck = (cur_vel_abs < FFW_VEL_GATE) &&
+                          (fabsf(pos_error) < FFW_MAX_DEG);
 
-    // Anti-windup
+    if (!joint_stuck) {
+        error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
+    }
+
     if      (error_vel_sum >  I_VEL_LIMIT) error_vel_sum =  I_VEL_LIMIT;
     else if (error_vel_sum < -I_VEL_LIMIT) error_vel_sum = -I_VEL_LIMIT;
 
@@ -92,11 +98,7 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
     if      (Output > 0) Output = Output * Gain_L;
     else if (Output < 0) Output = Output * Gain_R;
 
-    // Friction FFW
-    float pos_error    = REFdata.ref_q_deg - QEIdata.q_deg;
-    float cur_vel_abs  = fabsf(ESTdata.qd_est);
     float pwm_friction_ffw = 0.0f;
-
     if (cur_vel_abs < FFW_VEL_GATE) {
         if (pos_error > FFW_DEAD_DEG && pos_error < FFW_MAX_DEG) {
             float ratio = (pos_error - FFW_DEAD_DEG) / (FFW_MAX_DEG - FFW_DEAD_DEG);
@@ -110,9 +112,9 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
 
     *PWM_PID_out = Output + pwm_friction_ffw;
 
-    PIDDebug.pid_vel = Output ;
-	PIDDebug.p_vel = P_vel ;
-	PIDDebug.i_vel = I_vel ;
-	PIDDebug.d_vel = D_vel ;
-	PIDDebug.friction_ffw = pwm_friction_ffw ;
+    PIDDebug.pid_vel    = Output;
+    PIDDebug.p_vel      = P_vel;
+    PIDDebug.i_vel      = I_vel;
+    PIDDebug.d_vel      = D_vel;
+    PIDDebug.friction_ffw = pwm_friction_ffw;
 }
