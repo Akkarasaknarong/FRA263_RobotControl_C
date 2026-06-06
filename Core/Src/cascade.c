@@ -70,6 +70,12 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
     else if (PID_pos < -MAX_VELOCITY) PID_pos = -MAX_VELOCITY;
 
     float error_vel = PID_pos + ref_vel - cur_vel;
+
+    if ((error_vel > 0 && error_vel_prev < 0) ||
+		(error_vel < 0 && error_vel_prev > 0)) {
+		error_vel_sum = 0.0f;
+	}
+
     float P_vel = PIDparam.kp_vel * error_vel;
     float I_vel = PIDparam.ki_vel * error_vel_sum;
     float D_vel = PIDparam.kd_vel * (error_vel - error_vel_prev) / VELOCITY_CONTROL_FREQ;
