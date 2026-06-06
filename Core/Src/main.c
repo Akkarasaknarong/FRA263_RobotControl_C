@@ -883,8 +883,8 @@ void Quintic_P2P(float _q_start, float _q_final, float _t) {
 }
 
 void Quintic_List(int selec) {
-	float t_slow = 3.5f;
-	float t_fast = 3.5f;
+	float t_slow = 3.25f;
+	float t_fast = 3.25f;
 	float t_break = 2.0f ;
 	float tar_q = 180.0f;
 
