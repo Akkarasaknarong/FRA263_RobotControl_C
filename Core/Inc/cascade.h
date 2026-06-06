@@ -12,7 +12,7 @@
 #define VELOCITY_CONTROL_FREQ 0.0004 // 2500Hz
 #define MAX_VELOCITY 4.2 // approximately
 #define FRICTION_COMP  6200 // PWM
-#define POS_DEADZONE 0.2
+#define POS_DEADZONE 0.1
 #define FRICTION_VEL_THRESH 0.01
 
 #define I_POS_LIMIT      4.0f    // rad/s

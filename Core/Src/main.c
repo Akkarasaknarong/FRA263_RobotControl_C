@@ -153,7 +153,7 @@ Kalman_param_t Kalmanparam = { ._q_pos = 1,
 							   ._q_load = 10,
 							   ._q_i = 1e-01,
 							   ._r = 1e-20};
-int TH = 5000;
+float PWM_Out = 0 ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -829,6 +829,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		PWM_FF = V_FF * (65535.0f / 24.0f);
 		// PWM Output
 		MD20A_Control(PWM_FF+PWM_PID);
+		PWM_Out = PWM_FF + PWM_PID;
+
 	}
 
 	if (htim == &QEI_UPDATE_TIM) {

@@ -74,9 +74,15 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
 
     float friction_comp = 0;
     float pos_error = REFdata.ref_q - QEIdata.q;
+
+//    if (fabsf(pos_error) > POS_DEADZONE) {
+//        if      (pos_error  >  FRICTION_VEL_THRESH) friction_comp =  FRICTION_COMP;
+//        else if (pos_error  < -FRICTION_VEL_THRESH) friction_comp = -FRICTION_COMP;
+//    }
+
     if (fabsf(pos_error) > POS_DEADZONE) {
-        if      (pos_error  >  FRICTION_VEL_THRESH) friction_comp =  FRICTION_COMP;
-        else if (pos_error  < -FRICTION_VEL_THRESH) friction_comp = -FRICTION_COMP;
+        if      (pos_error > 0) friction_comp =  FRICTION_COMP;
+        else if (pos_error < 0) friction_comp = -FRICTION_COMP;
     }
 
     *PWM_PID_out = Output + friction_comp;
