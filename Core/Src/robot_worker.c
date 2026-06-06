@@ -244,25 +244,30 @@ void Test_Worker(){
 	static float t_wait = 1.0f ;
 
 	switch (state_test) {
-		case 0:
-			if (Robot.Testmode_data.Testtype == Precision_test){
+	case 0:
+		if (Robot.Testmode_data.Testtype == Precision_test) {
+			if (Robot.Testmode_data.Precision.repeat != 0) {
 				start_q = REFdata.ref_q_deg;
 
-				if (Robot.Testmode_data.Precision.unit == idx){
-					init_pos = IndexToDegree(Robot.Testmode_data.Precision.Init_pos) ;
-					targ_pos = IndexToDegree(Robot.Testmode_data.Precision.Targ_pos) ;
-				} else if (Robot.Testmode_data.Precision.unit == deg){
-					init_pos = Robot.Testmode_data.Precision.Init_pos ;
-					targ_pos = Robot.Testmode_data.Precision.Targ_pos ;
+				if (Robot.Testmode_data.Precision.unit == idx) {
+					init_pos = IndexToDegree(Robot.Testmode_data.Precision.Init_pos);
+					targ_pos = IndexToDegree(Robot.Testmode_data.Precision.Targ_pos);
+				} else if (Robot.Testmode_data.Precision.unit == deg) {
+					init_pos = Robot.Testmode_data.Precision.Init_pos;
+					targ_pos = Robot.Testmode_data.Precision.Targ_pos;
 				}
-				repeat = Robot.Testmode_data.Precision.repeat ;
+				repeat = Robot.Testmode_data.Precision.repeat;
 				repeat_count = 0;
 				Timer = 0;
 				state_test = 1;
+			}
 			} else if (Robot.Testmode_data.Testtype == Performance_test) {
 				start_q = REFdata.ref_q_deg;
 				Timer = 0;
 				state_test = 21;
+			}
+			else {
+				state_test = 99 ;
 			}
 			break;
 		case 1:
@@ -301,10 +306,11 @@ void Test_Worker(){
 		case 6:
 			if (Timer > t_wait){
 				Timer = 0 ;
-				state_test = 3 ;
-				repeat_count ++ ;
-				if (repeat_count >= repeat){
-					state_test = 99 ;
+				repeat_count++;
+				if (repeat_count < repeat){
+					state_test = 3;
+				} else {
+					state_test = 99;
 				}
 			}
 			break ;
