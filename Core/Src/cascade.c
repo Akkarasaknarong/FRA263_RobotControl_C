@@ -41,6 +41,12 @@ void Vel_ctrl_Tunning(float p_vel, float i_vel, float d_vel) {
 
 void Pos_ctrl_Compute(float ref_pos, float cur_pos) {
     float error_pos = ref_pos - cur_pos;
+
+    if ((error_pos > 0 && error_pos_prev < 0) ||
+		(error_pos < 0 && error_pos_prev > 0)) {
+		error_pos_sum = 0.0f;
+	}
+
     float P_pos = PIDparam.kp_pos * error_pos;
     float I_pos = PIDparam.ki_pos * error_pos_sum;
     float D_pos = PIDparam.kd_pos * (error_pos - error_pos_prev) / POSITION_CONTROL_FREQ;

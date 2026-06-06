@@ -71,7 +71,7 @@ refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
 KALMANstruct_t ESTdata = { 0 };
-PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 50, .kp_vel = 400.0f, .kd_vel =0, .ki_vel = 0 };
+PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 50, .kp_vel = 400.0f, .kd_vel =0, .ki_vel = 3000.0f };
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
@@ -788,6 +788,16 @@ void UART_Transmit(){
 	SerialFrame_AddPayload(&STLINK_UART_frame, &REFdata.ref_q_deg, sizeof(float));
 	SerialFrame_AddPayload(&STLINK_UART_frame, &REFdata.ref_qd, sizeof(float));
 	SerialFrame_AddPayload(&STLINK_UART_frame, &Timer, sizeof(float));
+
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.pid_pos, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.p_pos, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.i_pos, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.d_pos, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.pid_vel, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.p_vel, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.i_vel, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.d_vel, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.friction_ffw, sizeof(float));
 	SerialFrame_Transmit(&STLINK_UART_frame); // 2Header + 2Single
 }
 
