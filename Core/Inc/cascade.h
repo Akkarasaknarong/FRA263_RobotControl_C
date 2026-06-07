@@ -8,9 +8,6 @@
 #ifndef INC_CASCADE_H_
 #define INC_CASCADE_H_
 
-
-
-
 #define POSITION_CONTROL_FREQ 0.004f // 250Hz
 #define VELOCITY_CONTROL_FREQ 0.0004 // 2500Hz
 #define MAX_VELOCITY 4.4 // approximately

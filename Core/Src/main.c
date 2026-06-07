@@ -72,7 +72,7 @@ refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
 KALMANstruct_t ESTdata = { 0 };
-PIDParam_t PIDparam = { .kp_pos = 800,  .ki_pos = 50, .kd_pos = 0, .kp_vel = 1200.0f, .ki_vel = 500.0f, .kd_vel =0 };
+PIDParam_t PIDparam = { .kp_pos = 800,  .ki_pos = 0, .kd_pos = 0, .kp_vel = 1000.0f, .ki_vel = 0.0f, .kd_vel =0 };
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
@@ -843,7 +843,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		PWM_DFFW = V_DFFW * (65535.0f / 24.0f);
 		// Refference FFW
 		Motor_Ref_feedforward_Update(REFdata.ref_qd,&V_FF);
-		PWM_FF = V_FF * (65535.0f / 24.0f);
+		PWM_FF = V_FF * (65535.0f / 24.0f * 0.8f);
 
 		// PWM Output
 		MD20A_Control(PWM_FF+PWM_PID);
@@ -894,7 +894,7 @@ void Quintic_List(int selec) {
 	float t_slow = 1.4f;
 	float t_fast = 1.4f;
 	float t_break = 2.0f ;
-	float tar_q = 180.0f;
+	float tar_q = 210.0f;
 
 	// Rotate
 	if (selec == 1){
