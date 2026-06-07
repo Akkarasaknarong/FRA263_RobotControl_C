@@ -72,7 +72,7 @@ refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
 KALMANstruct_t ESTdata = { 0 };
-PIDParam_t PIDparam = { .kp_pos = 800,  .ki_pos = 50, .kd_pos = 0, .kp_vel = 400.0f, .ki_vel = 1000.0f, .kd_vel =0 };
+PIDParam_t PIDparam = { .kp_pos = 800,  .ki_pos = 50, .kd_pos = 0, .kp_vel = 1200.0f, .ki_vel = 500.0f, .kd_vel =0 };
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
@@ -891,10 +891,10 @@ void Quintic_P2P(float _q_start, float _q_final, float _t) {
 }
 
 void Quintic_List(int selec) {
-	float t_slow = 3.25f;
-	float t_fast = 3.25f;
+	float t_slow = 1.4f;
+	float t_fast = 1.4f;
 	float t_break = 2.0f ;
-	float tar_q = 220.0f;
+	float tar_q = 180.0f;
 
 	// Rotate
 	if (selec == 1){
