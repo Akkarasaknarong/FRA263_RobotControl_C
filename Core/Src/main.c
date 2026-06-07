@@ -834,6 +834,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		// Vel Control
 		Vel_ctrl_Tunning(PIDparam.kp_vel, PIDparam.ki_vel, PIDparam.kd_vel);
 		Vel_ctrl_Compute(REFdata.ref_qd , ESTdata.qd_est,&PWM_PID);
+
+		if (fabsf(REFdata.ref_qd) < 0.01f) {
+			Motor_Ref_feedforward_Init();
+		}
 		// Disturbance FFW
 		Motor_Disturbance_feedforward_Update(ESTdata.load_est,&V_DFFW);
 		PWM_DFFW = V_DFFW * (65535.0f / 24.0f);
@@ -890,7 +894,7 @@ void Quintic_List(int selec) {
 	float t_slow = 3.25f;
 	float t_fast = 3.25f;
 	float t_break = 2.0f ;
-	float tar_q = 180.0f;
+	float tar_q = 185.0f;
 
 	// Rotate
 	if (selec == 1){

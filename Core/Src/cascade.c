@@ -64,7 +64,7 @@ static const PID_LUT_Entry_t PID_LUT_SLOW[PID_LUT_SIZE] = {
     {800,    50,     0,      400,    1000,   0},  // [34] 170-174 deg
     {800,    50,     0,      400,    1000,   0},  // [35] 175-179 deg
     {800,    50,     0,      400,    200,   0},  // [36] 180-184 deg
-    {800,    50,     0,      400,    1000,   0},  // [37] 185-189 deg
+    {800,    50,     0,      400,    200,   0},  // [37] 185-189 deg
     {800,    50,     0,      400,    1000,   0},  // [38] 190-194 deg
     {800,    50,     0,      400,    1000,   0},  // [39] 195-199 deg
     {800,    50,     0,      400,    1000,   0},  // [40] 200-204 deg
@@ -268,14 +268,16 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
     float D_vel = PIDparam.kd_vel * (error_vel - error_vel_prev) / VELOCITY_CONTROL_FREQ;
 
     float pos_error   = REFdata.ref_q_deg - QEIdata.q_deg;
+
     float cur_vel_abs = fabsf(ESTdata.qd_est);
 
     uint8_t joint_stuck = (cur_vel_abs < FFW_VEL_GATE) &&
                           (fabsf(pos_error) < FFW_MAX_DEG);
 
-    // if (!joint_stuck) {
-    //     error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
-    // }
+     if (!joint_stuck) {
+         error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
+     }
+
     error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
 
     if      (error_vel_sum >  I_VEL_LIMIT) error_vel_sum =  I_VEL_LIMIT;
