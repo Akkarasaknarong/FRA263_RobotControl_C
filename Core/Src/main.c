@@ -894,7 +894,7 @@ void Quintic_List(int selec) {
 	float t_slow = 1.4f;
 	float t_fast = 1.4f;
 	float t_break = 2.0f ;
-	float tar_q = 210.0f;
+	float tar_q = 15.0f;
 
 	// Rotate
 	if (selec == 1){
