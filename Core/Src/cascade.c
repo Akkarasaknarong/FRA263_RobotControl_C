@@ -82,12 +82,14 @@ void Vel_ctrl_Compute(float ref_vel, float cur_vel, float *PWM_PID_out) {
 
     float pos_error   = REFdata.ref_q_deg - QEIdata.q_deg;
     float cur_vel_abs = fabsf(ESTdata.qd_est);
+
     uint8_t joint_stuck = (cur_vel_abs < FFW_VEL_GATE) &&
                           (fabsf(pos_error) < FFW_MAX_DEG);
 
-    if (!joint_stuck) {
-        error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
-    }
+    // if (!joint_stuck) {
+    //     error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
+    // }
+    error_vel_sum += error_vel * VELOCITY_CONTROL_FREQ;
 
     if      (error_vel_sum >  I_VEL_LIMIT) error_vel_sum =  I_VEL_LIMIT;
     else if (error_vel_sum < -I_VEL_LIMIT) error_vel_sum = -I_VEL_LIMIT;
