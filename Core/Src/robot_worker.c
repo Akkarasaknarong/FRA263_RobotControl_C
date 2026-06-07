@@ -294,7 +294,7 @@ void Test_Worker(){
 			if (Timer > t_wait){
 				Timer = 0 ;
 				repeat_count++;
-				if (repeat_count < repeat){
+				if (repeat_count < repeat - 1){
 					PID_LUT_Apply(fabsf(targ_pos - init_pos), t_go_front);
 					state_test = 3;
 				} else {
