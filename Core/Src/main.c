@@ -72,7 +72,7 @@ refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
 KALMANstruct_t ESTdata = { 0 };
-PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 50, .kp_vel = 400.0f, .kd_vel =0, .ki_vel = 500.0f };
+PIDParam_t PIDparam = { .kp_pos = 800,  .ki_pos = 50, .kd_pos = 0, .kp_vel = 400.0f, .ki_vel = 200.0f, .kd_vel =0 };
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
@@ -840,6 +840,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		// Refference FFW
 		Motor_Ref_feedforward_Update(REFdata.ref_qd,&V_FF);
 		PWM_FF = V_FF * (65535.0f / 24.0f);
+
 		// PWM Output
 		MD20A_Control(PWM_FF+PWM_PID);
 		PWM_Out = PWM_FF + PWM_PID;
