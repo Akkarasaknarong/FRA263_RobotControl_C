@@ -9,30 +9,11 @@
 #include "robot_worker.h"
 #include "gripper.h"
 #include "quintic_traj.h"
+#include "cascade.h"
 #include <math.h>
-extern PIDParam_t PIDparam;
 //extern u16u8_t reg[MODBUS_REGISTER_COUNT];
 
-void Apply_PID_Tuning(float target_deg) {
-//    float mod_deg = fmodf(target_deg, 360.0f);
-//    if (mod_deg < 0) mod_deg += 360.0f;
-//
-//    PIDparam.kd_pos = 0.0f;
-//    PIDparam.ki_pos = 0.0f;
-//    PIDparam.kp_vel = 0.6f;
-//    PIDparam.kd_vel = 0.0f;
-//    PIDparam.ki_vel = 0.0f;
-//
-//    if (mod_deg <= 90.0f) {
-//        PIDparam.kp_pos = 1000.0f;
-//    }
-//    else if (mod_deg <= 180.0f) {
-//        PIDparam.kp_pos = 1000.0f;
-//    }
-//    else {
-//        PIDparam.kp_pos = 1000.0f;
-//    }
-}
+// PID tuning is now handled by PID_LUT_Apply() in cascade.c
 
 float Remap_CW_CCW(Direction_t _Direction, float _Target_q_deg, float _Start_q_deg) {
     float current_mod = fmodf(_Start_q_deg, 360.0f);
@@ -72,7 +53,7 @@ void Auto_Worker() {
 				target_q = start_q + IndexToDegree((float)Robot.Automode_data.P2P.p2p_value);
 			}
 
-			Apply_PID_Tuning(target_q);
+			PID_LUT_Apply(fabsf(target_q - start_q), 2.5f);
 			Timer = 0;
 			state_auto = 88;
 		}
@@ -104,11 +85,11 @@ void Auto_Worker() {
 					target_q = Remap_CW_CCW(Robot.Automode_data.PickPlace.Direction[current_PickPlace], raw_target, start_q);
 				}
 				if (current_PickPlace % 2 == 0)
-					target_t = 1.3f; // 1.25f sec
+					target_t = 1.4f; // 1.25f sec
 				else
 					target_t = 3.25f; // 3.25f sec
 
-				Apply_PID_Tuning(target_q);
+				PID_LUT_Apply(fabsf(target_q - start_q), target_t);
 				Timer = 0;
 				state_auto = 1;
 			}
@@ -165,6 +146,7 @@ void Manual_Worker() {
 			if (Robot.Manualmode_data.Jog_value != 0) {
 				start_q = REFdata.ref_q_deg;
 				target_q = start_q + (float)Robot.Manualmode_data.Jog_value;
+				PID_LUT_Apply(fabsf(target_q - start_q), 2.5f);
 				Timer = 0;
 				state = 1;
 			}
@@ -259,11 +241,13 @@ void Test_Worker(){
 				}
 				repeat = Robot.Testmode_data.Precision.repeat;
 				repeat_count = 0;
+				PID_LUT_Apply(fabsf(init_pos - start_q), t_go_init);
 				Timer = 0;
 				state_test = 1;
 			}
 			} else if (Robot.Testmode_data.Testtype == Performance_test) {
 				start_q = REFdata.ref_q_deg;
+				PID_LUT_Apply(fabsf(start_q), t_go_init);
 				Timer = 0;
 				state_test = 21;
 			}
@@ -280,6 +264,7 @@ void Test_Worker(){
 			break;
 		case 2:
 			if (Timer > t_wait){
+				PID_LUT_Apply(fabsf(targ_pos - init_pos), t_go_front);
 				Timer = 0 ;
 				state_test = 3 ;
 			}
@@ -293,6 +278,7 @@ void Test_Worker(){
 			break;
 		case 4:
 			if (Timer > t_wait){
+				PID_LUT_Apply(fabsf(targ_pos - init_pos), t_go_back);
 				Timer = 0 ;
 				state_test = 5 ;
 			}
@@ -309,6 +295,7 @@ void Test_Worker(){
 				Timer = 0 ;
 				repeat_count++;
 				if (repeat_count < repeat){
+					PID_LUT_Apply(fabsf(targ_pos - init_pos), t_go_front);
 					state_test = 3;
 				} else {
 					state_test = 99;
@@ -327,6 +314,7 @@ void Test_Worker(){
 			break;
 		case 22:
 			if (Timer > t_wait){
+				PID_LUT_Apply(360.0f, 1.4f);
 				Timer = 0 ;
 				state_test = 23 ;
 			}
@@ -340,6 +328,7 @@ void Test_Worker(){
 			break;
 		case 24:
 			if (Timer > t_wait){
+				PID_LUT_Apply(360.0f, 1.4f);
 				Timer = 0 ;
 				state_test = 25 ;
 			}

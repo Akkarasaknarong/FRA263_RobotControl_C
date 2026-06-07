@@ -66,6 +66,7 @@ DMA_HandleTypeDef hdma_usart2_rx;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
+PIDDebug_t PIDDebug = {0};
 refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
@@ -841,7 +842,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		PWM_DFFW = V_DFFW * (65535.0f / 24.0f);
 		// Refference FFW
 		Motor_Ref_feedforward_Update(REFdata.ref_qd,&V_FF);
-		PWM_FF = V_FF * (65535.0f / 24.0f);
+		PWM_FF = V_FF * (65535.0f / 24.0f* FF_Scale);
 		// PWM Output
 		MD20A_Control(PWM_FF+PWM_PID);
 	}
