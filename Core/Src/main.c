@@ -72,7 +72,7 @@ refTarget_t REFdata = { 0 };
 QEIstruct_t QEIdata = { 0 };
 SSErrorstruct_t SSErrordata = {0};
 KALMANstruct_t ESTdata = { 0 };
-PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 50, .kp_vel = 400.0f, .kd_vel =0, .ki_vel = 1000.0f };
+PIDParam_t PIDparam = { .kp_pos = 800, .kd_pos = 0, .ki_pos = 50, .kp_vel = 400.0f, .kd_vel =0, .ki_vel = 500.0f };
 SerialFrame_t STLINK_UART_frame;
 
 Robot_t Robot = {
@@ -110,10 +110,10 @@ Robot_t Robot = {
 };
 
 float V_FF = 0 ;
-int PWM_FF = 0 ;
+float PWM_FF = 0 ;
 float PWM_PID = 0;
 float V_DFFW = 0 ;
-int PWM_DFFW = 0 ;
+float PWM_DFFW = 0 ;
 
 ModbusHandleTypedef hmodbus;
 u16u8_t reg[MODBUS_REGISTER_COUNT];
@@ -799,6 +799,9 @@ void UART_Transmit(){
 	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.i_vel, sizeof(float));
 	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.d_vel, sizeof(float));
 	SerialFrame_AddPayload(&STLINK_UART_frame, &PIDDebug.friction_ffw, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PWM_FF, sizeof(float));
+	SerialFrame_AddPayload(&STLINK_UART_frame, &PWM_DFFW, sizeof(float));
+
 	SerialFrame_Transmit(&STLINK_UART_frame); // 2Header + 2Single
 }
 
@@ -883,8 +886,8 @@ void Quintic_P2P(float _q_start, float _q_final, float _t) {
 }
 
 void Quintic_List(int selec) {
-	float t_slow = 3.5f;
-	float t_fast = 3.5f;
+	float t_slow = 3.25f;
+	float t_fast = 3.25f;
 	float t_break = 2.0f ;
 	float tar_q = 180.0f;
 
@@ -944,6 +947,40 @@ void Quintic_List(int selec) {
 		}
 		if (state_machine == 5) {
 			state_machine = 1 ;
+		}
+	}
+
+	if (selec == 3) {
+		if (state_machine == 1 && state_machine != last_state) {
+			PID_LUT_Apply(fabsf(tar_q - 0), t_slow);   // 360 deg, slow
+		}
+		if (state_machine == 1) {
+			Quintic_P2P(0, tar_q, t_slow);
+		}
+
+		if (state_machine == 2 && state_machine != last_state) {
+			PID_LUT_Apply(fabsf(tar_q - tar_q), t_break); // 0 deg, break
+		}
+		if (state_machine == 2) {
+			Quintic_P2P(tar_q, tar_q, t_break);
+		}
+
+		if (state_machine == 3 && state_machine != last_state) {
+			PID_LUT_Apply(fabsf(0 - tar_q), t_slow);   // 360 deg, slow
+		}
+		if (state_machine == 3) {
+			Quintic_P2P(tar_q, 0, t_slow);
+		}
+
+		if (state_machine == 4 && state_machine != last_state) {
+			PID_LUT_Apply(fabsf(0 - 0), t_break);      // 0 deg, break
+		}
+		if (state_machine == 4) {
+			Quintic_P2P(0, 0, t_break);
+		}
+
+		if (state_machine == 5) {
+			state_machine = 1;
 		}
 	}
 }
