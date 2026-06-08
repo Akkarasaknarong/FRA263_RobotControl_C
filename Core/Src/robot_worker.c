@@ -185,7 +185,7 @@ void Manual_Worker() {
 			}
 			break;
 		case 1: // JOG state
-			QuinticTraj_P2P(start_q, target_q, 2.5f, Timer);
+			QuinticTraj_P2P(start_q, target_q, 1.3f, Timer);
 			if (Timer >= 2.5f) {
 				state = 99;
 			}
@@ -319,7 +319,6 @@ void Test_Worker(){
 				}
 			}
 			break ;
-
 
 		case 21:
 			QuinticTraj_P2P(start_q, 0, t_go_init, Timer);
