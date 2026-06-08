@@ -252,10 +252,10 @@ int main(void)
 		Debug_Joystick._JW_Rotate_Right = HAL_GPIO_ReadPin(JS_Rotate_Right_GPIO_Port, JS_Rotate_Right_Pin);
 		Debug_Joystick._JW_Homing = HAL_GPIO_ReadPin(JS_HOME_GPIO_Port, JS_HOME_Pin);
 
-		reg[POSITION_FEEDBACK_REGISTER].U16 = map_to_0_360(TB_Pos) * 10;
-		reg[0x26].U16 = TB_Reed;
-		reg[0x27].U16 = TB_Current_robot_task;
-		reg[0x31].U16 = TB_safety_state;
+		// reg[POSITION_FEEDBACK_REGISTER].U16 = map_to_0_360(TB_Pos) * 10;
+		//  reg[0x26].U16 = TB_Reed;
+		// reg[0x27].U16 = TB_Current_robot_task;
+		// reg[0x31].U16 = TB_safety_state;
 		/* USER CODE END 3 */
 	}
 }

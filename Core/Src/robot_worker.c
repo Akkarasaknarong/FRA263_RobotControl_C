@@ -161,11 +161,22 @@ void Manual_Worker() {
 				state = 2;
 			}
 			else if (Robot.Manualmode_data.gripper_state != idle_gripper_state) {
-				if (Robot.Manualmode_data.gripper_state == Up) Gripper_Group(1, 0, 0, 0);
-				else if (Robot.Manualmode_data.gripper_state == Down) Gripper_Group(0, 1, 0, 0);
-				else if (Robot.Manualmode_data.gripper_state == Close) Gripper_Group(0, 0, 1, 0);
-				else if (Robot.Manualmode_data.gripper_state == Open) Gripper_Group(0, 0, 0, 1);
-
+				if (Robot.Manualmode_data.gripper_state == Up) {
+					Gripper_Group(1, 0, 0, 0);
+					reg[0x26].U16 = 1;
+				}
+				else if (Robot.Manualmode_data.gripper_state == Down){
+					reg[0x26].U16 = 2;
+					Gripper_Group(0, 1, 0, 0);
+				}
+				else if (Robot.Manualmode_data.gripper_state == Close){
+					reg[0x26].U16 = 4;
+					Gripper_Group(0, 0, 1, 0);
+				}
+				else if (Robot.Manualmode_data.gripper_state == Open){
+					reg[0x26].U16 = 0;
+					Gripper_Group(0, 0, 0, 1);
+				}
 				start_tick = HAL_GetTick(); wait_time = 800;
 				state = 2;
 			}
@@ -302,7 +313,6 @@ void Test_Worker(){
 				}
 			}
 			break ;
-
 
 
 		case 21:

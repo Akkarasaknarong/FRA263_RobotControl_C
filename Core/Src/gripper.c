@@ -6,6 +6,9 @@
  */
 
 #include "gripper.h"
+#include "datatype.h"
+#include "modbus.h"
+extern u16u8_t reg[MODBUS_REGISTER_COUNT];
 
 void Gripper_Group(int up, int down, int close, int open) {
 	HAL_GPIO_WritePin(Gripper_Up_GPIO_Port, Gripper_Up_Pin, up);
@@ -34,20 +37,26 @@ void Gripper_Control(int _Command) {
 	if (_Command == 0) {
 		if (internal_time <= 0.8f) {
 			Gripper_Group(0, 1, 0, 0);
+			reg[0x26].U16 = 2;
 		} else if (internal_time <= 1.2f) {
 			Gripper_Group(0, 0, 0, 1);
+			reg[0x26].U16 = 0;
 		} else {
 			Gripper_Group(1, 0, 0, 1);
+			reg[0x26].U16 = 1;
 		}
 	}
 
 	else if (_Command == 1) {
 		if (internal_time <= 0.8f) {
 			Gripper_Group(0, 1, 0, 0);
+			reg[0x26].U16 = 2;
 		} else if (internal_time <= 1.2f) {
 			Gripper_Group(0, 0, 1, 0);
+			reg[0x26].U16 = 4;
 		} else  {
 			Gripper_Group(1, 0, 1, 0);
+			reg[0x26].U16 = 1;
 		}
 	}
 	else {

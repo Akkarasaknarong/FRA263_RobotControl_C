@@ -11,6 +11,7 @@
 
 extern Robot_t Robot ;
 extern refTarget_t REFdata ;
+extern KALMANstruct_t ESTdata ;
 static u16u8_t* local_reg = {0};
 
 // Mode Selector Decode
@@ -198,8 +199,8 @@ void Basesystem_decode_Update(){
 
 void Basesystem_Feedback(){
 	reg[POSITION_FEEDBACK_REGISTER].I16 = (int16_t)(REFdata.ref_q_deg * 10.0f);
-	reg[VELOCITY_FEEDBACK_REGISTER].I16 = map_to_0_360(REFdata.ref_q_deg * 10.0f);
-	reg[ACCELERATION_FEEDBACK_REGISTER].I16 = (int16_t)(99 * 10.0f);
+	reg[VELOCITY_FEEDBACK_REGISTER].I16 = (int16_t)(ESTdata.qd_est* 10.0f);
+	reg[ACCELERATION_FEEDBACK_REGISTER].I16 = (int16_t)(RadianToDegree(ESTdata.q_est) * 10.0f);
 
 }
 
