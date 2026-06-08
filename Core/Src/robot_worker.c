@@ -98,6 +98,8 @@ void Auto_Worker() {
 		case 1: // Automode sequence : Trajactory State
 			QuinticTraj_P2P(start_q, target_q, target_t, Timer);
 			if (Timer > target_t) {
+				 PID_LUT_Apply(0.0f, 2.0f);
+
 				if (Robot.Automode_data.PickPlace.Gripper_Ena == GRIPPER_ENABLE) {
 					if (current_PickPlace % 2 == 0)
 						Gripper_Control(1); // Pick
@@ -113,6 +115,7 @@ void Auto_Worker() {
 			}
 			break;
 		case 2: // Gripper State
+			QuinticTraj_P2P(target_q, target_q, 2.0f, Timer);
 			if (current_PickPlace % 2 == 0) Gripper_Control(1);
 			else Gripper_Control(0);
 			if (HAL_GetTick() - gripper_start_tick >= 2000) {
