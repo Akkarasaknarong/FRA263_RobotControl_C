@@ -277,6 +277,7 @@ void Test_Worker(){
 			}
 			break;
 		case 2:
+			QuinticTraj_P2P(init_pos, init_pos, t_wait, Timer);
 			if (Timer > t_wait){
 				PID_LUT_Apply(fabsf(targ_pos - init_pos), t_go_front);
 				Timer = 0 ;
@@ -291,6 +292,7 @@ void Test_Worker(){
 			}
 			break;
 		case 4:
+			QuinticTraj_P2P(targ_pos, targ_pos, t_wait, Timer);
 			if (Timer > t_wait){
 				PID_LUT_Apply(fabsf(targ_pos - init_pos), t_go_back);
 				Timer = 0 ;
@@ -305,6 +307,7 @@ void Test_Worker(){
 			}
 			break ;
 		case 6:
+			QuinticTraj_P2P(init_pos, init_pos, t_wait, Timer);
 			if (Timer > t_wait){
 				Timer = 0 ;
 				repeat_count++;
