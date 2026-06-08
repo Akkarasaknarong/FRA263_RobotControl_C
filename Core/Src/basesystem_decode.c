@@ -195,6 +195,7 @@ void Basesystem_decode_Update(){
 	decode_manualmode();
 	decode_testmode();
 	decode_automode();
+	Robot.Homing = local_reg[0x01].U16;
 }
 
 void Basesystem_Feedback(){

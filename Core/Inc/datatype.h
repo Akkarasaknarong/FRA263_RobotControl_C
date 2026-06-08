@@ -261,6 +261,7 @@ typedef struct {
 	Feedback_t Feedback_data ;
 	Monitors_t Monitor_data ;
 	Joytick_t Joystick;
+	int Homing  ;
 } Robot_t;
 
 // Convert unit

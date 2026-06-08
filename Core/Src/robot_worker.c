@@ -372,6 +372,43 @@ void Test_Worker(){
 	}
 }
 
+void Homing_Worker(){
+    static int state_homing = 0;
+    static float start_q, target_q;
+
+    switch (state_homing) {
+        case 0: // Init Homing
+            start_q = REFdata.ref_q_deg;
+
+            // หา shortest path กลับ Home (0 deg)
+            float current_mod = fmodf(start_q, 360.0f);
+            if (current_mod < 0) current_mod += 360.0f;
+
+            float diff = 0.0f - current_mod; // Target = Home (0 deg)
+            if (diff > 180.0f)  diff -= 360.0f;
+            else if (diff < -180.0f) diff += 360.0f;
+
+            target_q = start_q + diff;
+
+            PID_LUT_Apply(fabsf(target_q - start_q), 3.25f);
+            Timer = 0;
+            state_homing = 1;
+            break;
+
+        case 1: // Move to Home
+            QuinticTraj_P2P(start_q, target_q, 3.25f, Timer);
+            if (Timer >= 3.25f) {
+                state_homing = 99;
+            }
+            break;
+
+        case 99: // End Homing
+            Robot.Homing = 0;
+            state_homing = 0;
+            break;
+    }
+}
+
 void Robot_Worker() {
 	if (Robot.Robot_Status == NOT_READY){
 		if (Robot.Mode == Mode_MANUAL){
@@ -384,6 +421,11 @@ void Robot_Worker() {
 			Test_Worker();
 		}
 	}
+
+	if (Robot.Homing == 1){
+		Homing_Worker();
+	}
+
 	Basesystem_Feedback();
 }
 
