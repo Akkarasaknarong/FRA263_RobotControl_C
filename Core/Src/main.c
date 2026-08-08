@@ -891,10 +891,21 @@ void Quintic_P2P(float _q_start, float _q_final, float _t) {
 }
 
 void Quintic_List(int selec) {
-	float t_slow = 1.4f;
-	float t_fast = 1.4f;
+	float t_slow = 3.25f;
+	float t_fast = 1.3f;
 	float t_break = 2.0f ;
-	float tar_q = 15.0f;
+	float tar_q = 180.0f;
+
+	float g = 5.0f ;
+
+	float p1 = 35;
+	float p2 = -20*g ;
+	float p3 = -10*g ;
+	float p4 = 15*g ;
+	float p5 = 55*g ;
+	float p6 = 72*g ;
+	float p7 = 36*g ;
+	float p8 = 0*g ;
 
 	// Rotate
 	if (selec == 1){
@@ -938,21 +949,57 @@ void Quintic_List(int selec) {
 
 	// Rotate with Pick Place
 	if (selec == 2) {
-		if (state_machine == 1) {
-			Quintic_P2P(0, tar_q, t_slow);
-		}
-		if (state_machine == 2) {
-			Quintic_P2P(tar_q, tar_q, t_break);
-		}
-		if (state_machine == 3) {
-			Quintic_P2P(tar_q, 0, t_slow);
-		}
-		if (state_machine == 4) {
-			Quintic_P2P(0, 0, t_break);
-		}
-		if (state_machine == 5) {
-			state_machine = 1 ;
-		}
+	    if (state_machine == 1) {
+	        Quintic_P2P(0, p1, t_fast);
+	    }
+	    if (state_machine == 2) {
+	        Quintic_P2P(p1, p1, t_break);
+	    }
+	    if (state_machine == 3) {
+	        Quintic_P2P(p1, p2, t_slow);
+	    }
+	    if (state_machine == 4) {
+	        Quintic_P2P(p2, p2, t_break);
+	    }
+	    if (state_machine == 5) {
+	        Quintic_P2P(p2, p3, t_fast);
+	    }
+	    if (state_machine == 6) {
+	        Quintic_P2P(p3, p3, t_break);
+	    }
+	    if (state_machine == 7) {
+	        Quintic_P2P(p3, p4, t_slow);
+	    }
+	    if (state_machine == 8) {
+	        Quintic_P2P(p4, p4, t_break);
+	    }
+	    if (state_machine == 9) {
+	        Quintic_P2P(p4, p5, t_fast);
+	    }
+	    if (state_machine == 10) {
+	        Quintic_P2P(p5, p5, t_break);
+	    }
+	    if (state_machine == 11) {
+	        Quintic_P2P(p5, p6, t_slow);
+	    }
+	    if (state_machine == 12) {
+	        Quintic_P2P(p6, p6, t_break);
+	    }
+	    if (state_machine == 13) {
+	        Quintic_P2P(p6, p7, t_fast);
+	    }
+	    if (state_machine == 14) {
+	        Quintic_P2P(p7, p7, t_break);
+	    }
+	    if (state_machine == 15) {
+	        Quintic_P2P(p7, p8, t_slow);
+	    }
+	    if (state_machine == 16) {
+	        Quintic_P2P(p8, p8, t_break);
+	    }
+	    if (state_machine == 17) {
+	        state_machine = 19;
+	    }
 	}
 
 	if (selec == 3) {
